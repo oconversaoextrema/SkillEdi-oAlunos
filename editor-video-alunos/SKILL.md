@@ -1,6 +1,6 @@
 ---
 name: editor-video-alunos
-description: Editar Reels e criativos (anúncios) verticais no padrão de edição do Tiago Tessmann, ou no padrão do próprio aluno a partir de uma referência que ele enviar. Use quando o aluno pedir para editar, cortar, legendar ou montar um vídeo, mandar um bruto, mandar uma referência de edição para copiar o estilo, ou escrever "editar".
+description: Editar Reels, criativos (anúncios) e vídeos de YouTube no padrão de edição do Tiago Tessmann, ou no padrão do próprio aluno a partir de uma referência que ele enviar. Use quando o aluno pedir para editar, cortar, legendar ou montar um vídeo, mandar um bruto, mandar uma referência de edição para copiar o estilo, ou escrever "editar".
 ---
 
 # Editor de vídeo — alunos
@@ -24,13 +24,16 @@ Se já existir um `references/padrao-do-aluno.md` no projeto dele, perguntar jun
 
 Junte todas numa mensagem só, numeradas, e **só comece a editar depois da resposta**. Não editar por conta antes de ter as respostas.
 
-> **2. É Reels ou criativo (anúncio)?**
+> **2. É Reels, criativo (anúncio) ou YouTube?**
 > **3.** — se **criativo**: **tela dividida ou tela inteira?**
 >    - *dividida* = gancho de ~4 s com material real embaixo e título na divisória, depois tela cheia.
 >    - *inteira* = tela cheia do primeiro ao último quadro, sem material embaixo.
 >    — se **Reels**: o padrão Tessmann já é dividida no começo virando tela cheia em ~60 % do vídeo. Só confirmar se ele quer assim.
-> **4. Formatos.** Criativo sai em até quatro: **RL 1080x1920**, **IN 1080x1350**, **GL 1080x1080**, **YT 1920x1080**. Perguntar quais ele quer. **Reels é um formato só: RL 1080x1920** — não perguntar.
-> **5. Algo específico?** Título do gancho, material que ele já tem (prints, clipes, logo), trecho para cortar fora, chamada final, se ele mesmo vai pôr a legenda dos primeiros 10 s.
+>    — se **YouTube**: não tem essa escolha. É apresentador em tela cheia com texto grande por cima, o vídeo inteiro.
+> **4. Formatos.** Criativo sai em até quatro: **RL 1080x1920**, **IN 1080x1350**, **GL 1080x1080**, **YT 1920x1080**. Perguntar quais ele quer. **Reels é um formato só (RL 1080x1920) e YouTube também (1920x1080)** — nesses dois não perguntar.
+> **5. Algo específico?** Título do gancho, material que ele já tem (prints, clipes, logo), trecho para cortar fora, chamada final, se ele mesmo vai pôr a legenda dos primeiros 10 s (Reels/criativo) ou os capítulos (YouTube).
+
+No **YouTube** a skill não renderiza sozinha: os scripts desta skill fazem vertical. Avisar isso na hora da resposta — o que sai é o corte, a transcrição revisada e o roteiro de edição completo (tempo, elemento, texto, tamanho em px, material a buscar), para ele montar no editor dele. Detalhe em `references/padrao-tessmann-youtube.md`.
 
 Regra geral da skill: perguntar pouco e decidir o resto sozinho. **Essas cinco perguntas são a exceção** — sem elas a edição sai errada. Depois delas, decidir o resto e só voltar a perguntar quando faltar algo que muda o resultado (um link, um arquivo, um dado que não dá para inventar).
 
@@ -48,10 +51,11 @@ Regra geral da skill: perguntar pouco e decidir o resto sozinho. **Essas cinco p
 
 - **Reels** → `references/padrao-tessmann-reels.md`
 - **Criativos (anúncios)** → `references/padrao-tessmann-criativos.md`
+- **YouTube (16:9)** → `references/padrao-tessmann-youtube.md`
 
-São os dois padrões medidos nas edições originais. Em caso de conflito entre eles e qualquer outra coisa escrita aqui, vale o arquivo do padrão.
+São os três padrões medidos nas edições originais. Em caso de conflito entre eles e qualquer outra coisa escrita aqui, vale o arquivo do padrão.
 
-## Regras que valem nos dois caminhos
+## Regras que valem nos dois caminhos e nos três padrões
 
 ### Corte e áudio
 1. **Cortar só silêncio de verdade.** Detector relativo ao piso de ruído (`scripts/cortar_silencios.py`), corte sempre dentro do silêncio, com margem preservada nas bordas. **Nunca** cortar usando timestamp de palavra da transcrição — foi assim que cortes começaram a comer o fim das palavras. Rodar a conferência depois.
@@ -59,18 +63,19 @@ São os dois padrões medidos nas edições originais. Em caso de conflito entre
 3. **Entrada e saída limpas**: o vídeo abre ~0,40 s antes da primeira palavra e fecha ~0,5 s depois da última. Esse respiro de entrada e saída não é encurtado. O vídeo tem que começar com a pessoa falando bonito, não em cima da fala.
 4. **Sem música de fundo** por padrão. Se o aluno quiser, ele manda a trilha e o volume fica baixo, embaixo da voz.
 
-### Legenda
-5. **Blocos por unidade de sentido.** Cada bloco fecha uma ideia curta. Nunca separar artigo, preposição ou adjetivo da palavra que acompanham; ponto final e vírgula fecham o bloco; nunca começar frase nova no meio de um bloco. Exemplo BOM/RUIM completo nos dois arquivos de padrão.
+### Legenda (Reels e criativo — no YouTube não tem legenda queimada)
+5. **Blocos por unidade de sentido.** Cada bloco fecha uma ideia curta. Nunca separar artigo, preposição ou adjetivo da palavra que acompanham; ponto final e vírgula fecham o bloco; nunca começar frase nova no meio de um bloco. Exemplo BOM/RUIM completo nos arquivos de padrão de Reels e de criativo.
 6. **Revisar a transcrição** antes de renderizar: nome próprio, número, sigla e jargão do nicho a máquina erra. Conferir a sincronia extraindo o quadro no instante exato de algumas palavras.
 7. **Primeiros 10 s sem legenda** no padrão Tessmann — a legenda de abertura é colocada à mão depois. Confirmar com o aluno se ele quer assim.
+7a. **No YouTube não entra legenda no vídeo.** O que aparece sobre a imagem é o texto grande do padrão (frase de impacto, frase âncora, lista, ilustração), com os tamanhos de `references/padrao-tessmann-youtube.md`. A regra 5 vale para escolher o texto desses blocos: frase curta, ideia fechada.
 
 ### Imagem
 8. **Primeiro quadro forte**: material de verdade, cena de notícia, vídeo da coisa citada. Nunca só um logo parado.
-9. **A área de cima tem que bater com a fala, no instante da fala.** Listar cada coisa concreta citada na transcrição e buscar **aquilo mesmo**. Material genérico "do tema" não serve.
+9. **A área de cima tem que bater com a fala, no instante da fala.** No YouTube, o equivalente é o insert e a ilustração: entram na frase que eles ilustram, não antes nem depois. Listar cada coisa concreta citada na transcrição e buscar **aquilo mesmo**. Material genérico "do tema" não serve.
 10. **Só material real** — TikTok, YouTube, Instagram, print de notícia, gravação de tela, logo oficial. **Nada de banco de imagem** nem b-roll publicitário de estúdio.
 11. **Nada repetido**: cada clipe ou imagem aparece uma vez só no vídeo.
 12. **Enquadramento conferido no quadro real**, não no olho: centrar o recorte no rosto detectado, cabeça e mãos inteiras, e conferir a janela inteira do clipe (a cada 0,5 s) para não pegar transição de estúdio no meio. Descartar clipe com texto queimado, tarja/lower-third, split-screen ou barra preta.
-13. **Sem crédito de fonte na tela.** A procedência fica registrada em `referencias/<vídeo>/fontes.md`, com URL, autor, veículo e data.
+13. **Sem crédito de fonte na tela** nos verticais — a procedência fica registrada em `referencias/<vídeo>/fontes.md`, com URL, autor, veículo e data. **No YouTube é o contrário**: o insert leva a legenda da fonte em cinza 26 px embaixo à esquerda.
 
 ### Material da internet
 14. Buscar bastante e conferir identidade, contexto e data antes de usar. **Nunca inventar imagem e apresentar como real** — se não achar, dizer que não achou e pedir o link ou o arquivo.
@@ -89,6 +94,7 @@ O aluno decide o destino. Padrão: uma pasta por vídeo, com o nome do vídeo.
 
 - **Reels**: um arquivo, `<nome do vídeo>.mp4` (RL 1080x1920).
 - **Criativo**: um arquivo por formato, `<título> - RL.mp4`, `<título> - IN.mp4`, `<título> - GL.mp4`, `<título> - YT.mp4`.
+- **YouTube**: `<título>.mp4` (1920x1080), mais o `fontes.md` do material usado e, se ele quiser, uma versão leve em 720p.
 
 Evitar `?`, `:`, `/` e `*` no nome do arquivo — quebram em pendrive e HD externo (ExFAT).
 
@@ -106,6 +112,8 @@ Entregar só depois de conferir. Se alguma coisa ficou fora do padrão e não de
 | `reels2.py` | renderiza Reels (dividida → transição → tela cheia) |
 | `baixar.py` | baixa trecho de vídeo do YouTube/TikTok/Instagram para a área de cima |
 | `exemplo-criativo.py`, `exemplo-reel.py` | configs reais, para copiar e adaptar |
+
+**O padrão YouTube não tem script aqui**: ele é 16:9 e os renderizadores desta skill são verticais. Nesse caso a entrega é o corte, a transcrição revisada e o roteiro de edição — e o aluno monta no editor dele (ou implementa em Remotion, que é como o original foi feito).
 
 Nada disso é obrigatório: se o aluno editar no Premiere, CapCut ou DaVinci, os arquivos de padrão continuam valendo como especificação (tamanho de fonte, posição, tempos, ritmo) e a skill vira o roteiro de edição dele — plano de cena por cena com os tempos, os blocos de legenda já quebrados e a lista de material a buscar.
 
