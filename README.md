@@ -1,66 +1,71 @@
 # Skill de edição — alunos
 
-Pacote de edição de **Reels** e **criativos (anúncios)** verticais no padrão do Tiago Tessmann, para usar
-dentro do Claude Code.
+Editor de vídeo para usar no Claude (Claude Code ou o app Claude no computador). Traz **todas as ferramentas** que a
+gente usa nas edições do Tiago Tessmann — e instala sozinha na primeira vez.
 
-A skill começa perguntando se você quer **mandar uma referência sua** de edição, para ela copiar o seu
-estilo, ou usar o **padrão do Tessmann** — que já está medido aqui, em pixels e em segundos.
+Quando você escreve **`editar`**, ela pergunta como você quer editar:
 
-Padrões prontos: **Reels**, **criativo (anúncio)** e **YouTube (16:9)**.
+- **a) A partir de uma referência** — você manda um vídeo editado do jeito que gosta e ela copia o estilo.
+- **b) Do zero** — você explica como imagina a edição e ela monta.
+- **c) No padrão do Tiago Tessmann** — Reels, criativos (anúncios) e YouTube, medidos nas edições originais.
 
 ## Instalar
 
-Clone e copie a pasta `editor-video-alunos/` para as skills do seu projeto:
+Baixe o `.zip` (botão **Code → Download ZIP**) ou clone:
 
 ```bash
 git clone https://github.com/ruanhoracio-ue/SkillEdi-oAlunos.git
-mkdir -p <seu-projeto>/.claude/skills
-cp -R SkillEdi-oAlunos/editor-video-alunos <seu-projeto>/.claude/skills/
+mkdir -p ~/.claude/skills
+cp -R SkillEdi-oAlunos/editor-video-alunos ~/.claude/skills/
 ```
 
-Para deixar disponível em todos os seus projetos, copie para `~/.claude/skills/` em vez da pasta do projeto.
+No app do Claude, você também pode enviar a pasta `editor-video-alunos` compactada em Configurações → Skills.
 
-Depois abra o Claude Code na pasta do projeto e escreva **`editar`**.
+Depois abra o Claude na pasta onde você vai editar e escreva **`editar`**.
 
-## O que a skill pergunta
+## Ferramentas (instaladas automaticamente)
 
-1. Referência sua ou padrão do Tiago Tessmann?
-2. Reels, criativo (anúncio) ou YouTube?
-3. Se for criativo: tela dividida ou tela inteira?
-4. Formatos — criativo sai em RL 1080x1920, IN 1080x1350, GL 1080x1080 e YT 1920x1080; Reels é só RL 1080x1920 e YouTube só 1920x1080.
-5. Algo específico: título, material que você já tem, trecho para cortar fora.
+Na primeira vez a skill instala tudo em `~/.editor-video` — 5 a 10 minutos, ~1,5 GB, sem senha de administrador:
 
-Só depois das respostas ela começa a editar.
+| ferramenta | para quê |
+|---|---|
+| Python 3.12 + bibliotecas | o motor dos scripts (PyAV, OpenCV, Pillow, numpy) |
+| ffmpeg / ffprobe | cortar, juntar, converter, render final |
+| Whisper (faster-whisper, modelo small) | transcrição e legenda palavra por palavra, offline |
+| yt-dlp | baixar trechos de vídeo da internet para usar de material |
+| Remotion | montar o vídeo em React (tela dividida, inserts, legenda, YouTube 16:9) |
+| HyperFrames | animações em HTML/GSAP (telas de app, cursor, cartões, lettering) |
+| Robust Video Matting | recortar você do fundo (texto passando atrás) |
+| Fontes TikTok Sans, Manrope, Inter, Montserrat | licença OFL |
+
+Para instalar ou conferir antes, no terminal:
+
+```bash
+bash ~/.claude/skills/editor-video-alunos/scripts/instalar.sh              # instala
+bash ~/.claude/skills/editor-video-alunos/scripts/instalar.sh --verificar  # só confere
+```
+
+Windows (PowerShell): `powershell -ExecutionPolicy Bypass -File $HOME\.claude\skills\editor-video-alunos\scripts\instalar.ps1`
 
 ## O que tem no pacote
 
 | arquivo | o que é |
 |---|---|
-| `SKILL.md` | as perguntas de abertura, as regras de toda edição e o fluxo de entrega |
-| `references/padrao-tessmann-reels.md` | o padrão de Reels, medido nas edições originais |
-| `references/padrao-tessmann-criativos.md` | o padrão de criativos, com os quatro formatos |
-| `references/padrao-tessmann-youtube.md` | o padrão de YouTube 16:9: texto grande sobre o vídeo, painéis pretos, inserts |
+| `SKILL.md` | instalação automática, a pergunta de abertura, as regras de toda edição e a entrega |
+| `references/ferramentas.md` | manual das ferramentas: comandos, receitas de ffmpeg, regras do Remotion e do HyperFrames |
+| `references/editar-do-zero.md` | as perguntas e o padrão-base quando você descreve a edição |
 | `references/treinar-com-referencia.md` | como medir uma referência sua e transformar em padrão |
-| `references/modelo-padrao-do-aluno.md` | esqueleto em branco do seu padrão |
-| `references/pipeline-tecnico.md` | instalação e passo a passo do render |
-| `scripts/` | o pipeline (corte de respiros, transcrição, rastreio de rosto, render) e dois configs de exemplo |
+| `references/modelo-padrao-do-aluno.md` | esqueleto do seu padrão |
+| `references/padrao-tessmann-*.md` | os padrões do Tiago: Reels, criativos, YouTube |
+| `references/pipeline-tecnico.md` | o pipeline Python do padrão Tessmann, passo a passo |
+| `scripts/` | instalador, corte de silêncio, transcrição, recorte de pessoa, download, render de Reels/criativo |
+| `assets/remotion-modelo/` | projeto Remotion pronto (vídeo + inserts + legenda palavra por palavra) |
+| `assets/hyperframes-modelo/` | composição HyperFrames de exemplo |
 
-## Antes de rodar
-
-Python 3.11 ou mais novo, ffmpeg e a fonte TikTok Sans variável. O passo a passo está em
-`editor-video-alunos/references/pipeline-tecnico.md`.
-
-Você não precisa dos scripts para usar a skill: se você edita no Premiere, CapCut ou DaVinci, os arquivos de
-padrão valem como especificação (tamanho de fonte, posição, tempos, ritmo) e a skill monta o roteiro de
-edição — cena por cena, com a legenda já quebrada e a lista de material a buscar.
-
-## YouTube
-
-O padrão de YouTube é 16:9 e **não tem renderizador aqui** — os scripts do pacote fazem vertical. Nesse padrão a
-skill entrega o corte, a transcrição revisada e o **roteiro de edição completo** (tempo, elemento, texto, tamanho
-em px e material a buscar), e você monta no seu editor.
+Se você edita no Premiere, CapCut ou DaVinci, a skill também entrega o roteiro de edição (cena por cena, legenda
+já quebrada, lista de material) em vez do MP4.
 
 ## Aviso
 
-Os assets de transição usados no padrão original (overlay de film burn) são de um pack pago e **não vêm
+Os assets de transição usados no padrão original de Reels (overlay de film burn) são de um pack pago e **não vêm
 aqui**. Use um overlay seu ou `burn=None` no config, que corta seco na virada.

@@ -1,0 +1,9 @@
+{
+  "bruto": "bruto.mp4",
+  "fps": 30, "largura": 1080, "altura": 1920, "duracao": 3,
+  "palavras": [{"w": "Edição", "s": 0.2, "e": 0.7}, {"w": "de", "s": 0.7, "e": 0.85}, {"w": "teste", "s": 0.85, "e": 1.4}],
+  "blocos": [[0], [1, 2]],
+  "inserts": [],
+  "estilo": {"fonte": "Helvetica Neue, Arial, sans-serif", "tamanho": 86, "cor": "#FFFFFF", "destaque": "#39FF14",
+             "yLegenda": 1190, "yLegendaDividida": 1000, "divisoria": 960}
+}

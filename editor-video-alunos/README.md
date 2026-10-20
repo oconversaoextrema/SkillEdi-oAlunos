@@ -1,46 +1,64 @@
 # Skill de edição — alunos
 
-Pacote de edição de Reels, criativos (anúncios) e vídeos de YouTube no padrão do Tiago Tessmann, para os
-alunos usarem no Claude Code.
+Editor de vídeo para usar no Claude (Claude Code ou o app Claude no computador). Traz todas as ferramentas que a
+gente usa nas edições do Tiago Tessmann e edita de três jeitos:
+
+- **a partir de uma referência** — você manda um vídeo editado do jeito que gosta e ele copia o estilo;
+- **do zero** — você explica como imagina a edição;
+- **no padrão do Tiago Tessmann** — Reels, criativos (anúncios) e YouTube, medidos nas edições originais.
 
 ## Instalar
 
-Copie a pasta inteira para o projeto onde você edita:
+1. Coloque a pasta `editor-video-alunos` em `~/.claude/skills/` (vale para todos os projetos) ou em
+   `<seu-projeto>/.claude/skills/`. No app do Claude, você também pode enviar o `.zip` em Configurações → Skills.
+2. Abra o Claude na pasta onde você vai editar e escreva **`editar`**.
 
-```
-<seu-projeto>/.claude/skills/editor-video-alunos/
+Na primeira vez a skill instala sozinha as ferramentas (5 a 10 minutos, ~1,5 GB, sem senha de administrador), na
+pasta `~/.editor-video`:
+
+| ferramenta | para quê |
+|---|---|
+| Python 3.12 + bibliotecas | o motor dos scripts (PyAV, OpenCV, Pillow, numpy) |
+| ffmpeg / ffprobe | cortar, juntar, converter, render final |
+| Whisper (faster-whisper, modelo small) | transcrição e legenda palavra por palavra, offline |
+| yt-dlp | baixar trechos de vídeo da internet para usar de material |
+| Remotion | montar o vídeo em React (tela dividida, inserts, legenda, YouTube) |
+| HyperFrames | animações em HTML/GSAP (telas de app, cursor, cartões, lettering) |
+| Robust Video Matting | recortar você do fundo (texto passando atrás) |
+| Fontes TikTok Sans, Manrope, Inter, Montserrat | licença OFL |
+
+Se quiser instalar antes, no terminal:
+
+```bash
+bash ~/.claude/skills/editor-video-alunos/scripts/instalar.sh
 ```
 
-Ou, para deixar disponível em todos os seus projetos:
+No Windows (PowerShell):
 
-```
-~/.claude/skills/editor-video-alunos/
+```powershell
+powershell -ExecutionPolicy Bypass -File $HOME\.claude\skills\editor-video-alunos\scripts\instalar.ps1
 ```
 
-Abra o Claude Code na pasta do projeto e escreva **`editar`**. A skill começa perguntando se você quer usar
-uma referência sua ou o padrão do Tessmann.
+Para só conferir o que está instalado, acrescente `--verificar`.
 
 ## O que tem aqui
 
 | arquivo | o que é |
 |---|---|
-| `SKILL.md` | as perguntas de abertura, as regras que valem em toda edição e o fluxo de entrega |
-| `references/padrao-tessmann-reels.md` | o padrão de Reels, medido nas edições originais |
-| `references/padrao-tessmann-criativos.md` | o padrão de criativos (anúncios), com os quatro formatos |
-| `references/padrao-tessmann-youtube.md` | o padrão de YouTube 16:9 (texto grande sobre o vídeo, painéis, inserts) |
-| `references/treinar-com-referencia.md` | como medir uma referência sua e virar padrão |
-| `references/modelo-padrao-do-aluno.md` | esqueleto em branco do seu padrão |
-| `references/pipeline-tecnico.md` | instalação e passo a passo de render |
-| `scripts/` | o pipeline (corte, transcrição, rosto, render) e dois configs de exemplo |
+| `SKILL.md` | instalação automática, a pergunta de abertura, as regras de toda edição e a entrega |
+| `references/ferramentas.md` | manual das ferramentas: comandos, receitas de ffmpeg, regras do Remotion e do HyperFrames |
+| `references/editar-do-zero.md` | as perguntas e o padrão-base quando você descreve a edição |
+| `references/treinar-com-referencia.md` | como medir um vídeo de referência e virar o seu padrão |
+| `references/modelo-padrao-do-aluno.md` | esqueleto do seu padrão (fica salvo no seu projeto) |
+| `references/padrao-tessmann-*.md` | os padrões do Tiago: Reels, criativos, YouTube |
+| `references/pipeline-tecnico.md` | o pipeline Python do padrão Tessmann, passo a passo |
+| `scripts/instalar.*` | instalador (Mac/Linux `.sh`, Windows `.ps1`) |
+| `scripts/` | corte de silêncio, transcrição, recorte de pessoa, download, render de Reels/criativo |
+| `assets/remotion-modelo/` | projeto Remotion pronto (vídeo + inserts + legenda palavra por palavra) |
+| `assets/hyperframes-modelo/` | composição HyperFrames de exemplo |
 
-## Antes de rodar
+Se você edita no Premiere, CapCut ou DaVinci, a skill também entrega o roteiro de edição (cena por cena, legenda
+já quebrada, lista de material) em vez do MP4.
 
-Você precisa de Python 3.11 ou mais novo, ffmpeg e a fonte TikTok Sans variável. Está tudo em
-`references/pipeline-tecnico.md`.
-
-Você não precisa dos scripts para usar a skill: se você edita no Premiere, CapCut ou DaVinci, os arquivos de
-padrão valem como especificação (tamanho de fonte, posição, tempos, ritmo) e a skill monta o roteiro de
-edição — cena por cena, com a legenda já quebrada e a lista de material a buscar.
-
-O padrão de YouTube é 16:9 e não tem renderizador aqui (os scripts fazem vertical): nele a skill entrega o
-corte, a transcrição revisada e o roteiro de edição, e você monta no seu editor.
+Testado em 20/10/2026 num Mac (Apple Silicon) instalando do zero: Whisper, Remotion, HyperFrames, recorte e o
+pipeline do padrão Tessmann renderizaram.

@@ -1,0 +1,10 @@
+# versões testadas juntas (20/10/2026). PyAV 19 quebra o faster-whisper 1.2.1 (metadata_errors).
+pillow>=10,<13
+av==18.1.0
+numpy>=1.26,<3
+imageio-ffmpeg>=0.5
+static-ffmpeg>=2.7
+faster-whisper==1.2.1
+opencv-python-headless>=4.9,<5   # o 5 tirou o CascadeClassifier (rastreio de rosto)
+onnxruntime>=1.18,<2
+yt-dlp

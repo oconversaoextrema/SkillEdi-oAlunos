@@ -39,29 +39,19 @@ Os exemplos `exemplo-criativo.py` e `exemplo-reel.py` fazem `sys.path.insert` de
 
 ## 2. Instalação
 
-Python 3.11 ou mais novo. Na pasta do projeto:
+Feita pelo instalador da skill (Passo 0 do SKILL.md): `bash scripts/instalar.sh` (Windows: `scripts\instalar.ps1`).
+Ele cria o Python 3.12 com todas as bibliotecas, o ffmpeg, o modelo Whisper `small` e as fontes em `~/.editor-video`.
+Depois, `scripts/novo_projeto.py <pasta>` monta a estrutura acima: copia os scripts para `work/`, grava
+`ferramentas/ffmpeg_path.txt` e liga `models/` e `ferramentas/fontes/` (com a `TikTokSans-Variable.ttf`) às pastas
+instaladas. Rodar os scripts sempre com o Python das ferramentas: `~/.editor-video/venv/bin/python`.
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install pillow av numpy imageio-ffmpeg faster-whisper opencv-python-headless yt-dlp
-```
-
-ffmpeg (vem junto com o `imageio-ffmpeg`, não precisa instalar no sistema):
-
-```bash
-mkdir -p ferramentas/fontes models trilhas/efeitos brutos saidas referencias work
-python -c "import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())" > ferramentas/ffmpeg_path.txt
-cat ferramentas/ffmpeg_path.txt   # confira que é um caminho existente
-```
-
-Fonte: baixe a **TikTok Sans** (família open source, disponível no Google Fonts) na versão variável e salve como `ferramentas/fontes/TikTokSans-Variable.ttf`. Um `.ttf` estático não serve: o código muda o peso pelos eixos da variável (a legenda usa peso 500 no Reels e 650 no criativo; o título usa 700).
+Fonte: a **TikTok Sans** variável já vem do instalador (`ferramentas/fontes/TikTokSans-Variable.ttf`). Um `.ttf` estático não serve: o código muda o peso pelos eixos da variável (a legenda usa peso 500 no Reels e 650 no criativo; o título usa 700).
 
 Transição do Reels: os dois arquivos `trilhas/efeitos/film-transition-11.mov` e `.wav` **não vêm com a skill** (são de um pack pago). Sem eles, ponha um overlay seu com esses nomes, aponte o campo `burn` do config para os seus arquivos (item 6) ou use `burn=None` para cortar seco na virada.
 
 Bruto: grave **vertical 9:16**. O prep faz `scale=1620:2880` sem preservar proporção; um bruto 16:9 sai esticado.
 
-Whisper: o modelo `small` é baixado uma vez para `models/`. No `criativo_prep.py` a linha está com `local_files_only=True`, o que impede o download. Na primeira vez, rode com `local_files_only=False` (ou baixe o modelo antes) e depois volte para `True` — assim ele nunca tenta rede de novo.
+Whisper: o modelo `small` já vem baixado pelo instalador (`models/` aponta para `~/.editor-video/models`). O `criativo_prep.py` usa `local_files_only=True`: nunca tenta rede.
 
 ## 3. Passo a passo de uma edição
 

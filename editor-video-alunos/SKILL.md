@@ -1,61 +1,97 @@
 ---
 name: editor-video-alunos
-description: Editar Reels, criativos (anúncios) e vídeos de YouTube no padrão de edição do Tiago Tessmann, ou no padrão do próprio aluno a partir de uma referência que ele enviar. Use quando o aluno pedir para editar, cortar, legendar ou montar um vídeo, mandar um bruto, mandar uma referência de edição para copiar o estilo, ou escrever "editar".
+description: Editor de vídeo completo para alunos do Tiago Tessmann — instala sozinho todas as ferramentas (ffmpeg, Whisper, yt-dlp, Remotion, HyperFrames, recorte de pessoa, fontes) e edita Reels, criativos e YouTube a partir de uma referência que o aluno manda, do zero pela descrição dele, ou no padrão do Tiago Tessmann. Use quando o aluno escrever "editar", "edita esse vídeo", mandar um bruto ou uma referência de edição, ou pedir para instalar/configurar as ferramentas de edição.
 ---
 
 # Editor de vídeo — alunos
 
-Skill de edição para os **alunos do Tiago Tessmann**. Ela reproduz o mesmo padrão de edição usado nos vídeos dele — medido quadro a quadro em cima das edições originais — e também sabe **aprender o padrão do próprio aluno** a partir de uma referência que ele enviar.
+Skill de edição para os **alunos do Tiago Tessmann**. Ela traz as mesmas ferramentas usadas nas edições do Tiago e
+três jeitos de editar: **copiar uma referência**, **do zero pelo que o aluno descrever**, ou **o padrão do Tessmann**
+(medido quadro a quadro nas edições originais).
 
-Tudo em português brasileiro. O aluno é o dono do vídeo: ele aprova, ele decide onde salvar.
+Tudo em português brasileiro, em linguagem simples — o aluno não precisa saber programar. O aluno é o dono do vídeo:
+ele aprova, ele decide onde salvar.
+
+## Passo 0 — ferramentas (automático, antes de qualquer edição)
+
+Na primeira vez (e sempre que algo faltar), instalar tudo sem pedir para o aluno digitar comando:
+
+1. Conferir: `bash <skill>/scripts/instalar.sh --verificar` (Windows: `powershell -ExecutionPolicy Bypass -File <skill>\scripts\instalar.ps1 --verificar`).
+   `<skill>` é a pasta desta skill (onde está este SKILL.md).
+2. Se aparecer **FALTA** (ou `~/.editor-video/ambiente.json` não existir), avisar em uma frase — *"vou instalar as
+   ferramentas de edição, leva uns 5 a 10 minutos e baixa ~1,5 GB, só na primeira vez"* — e rodar o mesmo comando
+   sem `--verificar`, em segundo plano. Ele instala na pasta `~/.editor-video`, **sem senha de administrador**:
+   - Python 3.12 (via uv) com Whisper (faster-whisper), PyAV, OpenCV, Pillow, numpy, onnxruntime, yt-dlp;
+   - ffmpeg e ffprobe;
+   - Node.js portátil (se o computador não tiver Node 18+);
+   - **HyperFrames** (animação HTML/CSS/GSAP → MP4) e **Remotion** (vídeo em React → MP4, com o navegador dele);
+   - modelo **Whisper small** (transcrição offline) e **Robust Video Matting** (recortar a pessoa do fundo);
+   - fontes TikTok Sans, Manrope, Inter e Montserrat (licença OFL).
+   Rodar de novo é seguro: o que já existe é pulado. Se der erro, ler a saída, corrigir e rodar de novo — só pedir
+   ajuda ao aluno se for algo que só ele pode fazer (internet, espaço em disco, permissão).
+3. Na pasta do projeto do aluno, uma vez: `~/.editor-video/venv/bin/python <skill>/scripts/novo_projeto.py .`
+   (Windows: `~\.editor-video\venv\Scripts\python.exe`). Cria `brutos/ saidas/ referencias/ work/`, copia os scripts
+   e os modelos de Remotion e HyperFrames.
+
+Manual de cada ferramenta (comandos, regras que quebram o render, receitas de ffmpeg): `references/ferramentas.md`.
+Antes de rodar qualquer coisa no terminal: `source ~/.editor-video/ambiente.sh` (Windows: `. ~\.editor-video\ambiente.ps1`).
 
 ## A PRIMEIRA PERGUNTA — sempre esta
 
-Quando a skill é ativada (o aluno escreve "editar", manda um bruto, ou pede uma edição), **a primeira coisa é perguntar de qual padrão ele quer o vídeo**:
+Quando o aluno escreve "editar" (ou manda um bruto, ou pede uma edição), a primeira coisa é perguntar:
 
-> **1. Você quer jogar uma referência sua de edição pra eu copiar o estilo, ou quer usar a edição do Tiago Tessmann (o padrão que a gente treinou)?**
+> **1. Como você quer editar?**
+> **a) A partir de uma referência** — você me manda um vídeo editado do jeito que você gosta e eu copio o estilo.
+> **b) Do zero** — você me explica como imagina a edição e eu monto.
+> **c) No padrão do Tiago Tessmann** — a edição que a gente usa nos vídeos do Tiago, já pronta.
 
-- **"Referência minha"** → caminho A (abaixo). O aluno manda um ou mais vídeos e eu meço tudo antes de editar.
-- **"Padrão do Tessmann"** → caminho B (abaixo). Já está tudo medido nos arquivos de referência desta skill.
+Se já existir um `references/padrao-do-aluno.md` no projeto dele, oferecer também: *"achei um padrão seu já
+treinado (`<nome>`, de `<data>`) — uso ele?"*
 
-Se já existir um `references/padrao-do-aluno.md` no projeto dele, perguntar junto: *"achei um padrão seu já treinado (`<nome>`, de `<data>`) — uso ele, treino de novo com uma referência nova, ou vamos de padrão Tessmann?"*
+E na mesma mensagem, numeradas:
 
-## As outras perguntas — na mesma mensagem
+> **2. Qual é o vídeo?** Me manda o bruto (arquivo do vídeo gravado) — ou o caminho dele no computador.
+> **3. Onde vai postar?** Reels/TikTok/Shorts (1080x1920), feed (1080x1350), quadrado (1080x1080), YouTube (1920x1080). Pode ser mais de um.
+> **4. Algo específico?** Título, material que você já tem (prints, vídeos, logo), trecho para cortar, chamada final.
 
-Junte todas numa mensagem só, numeradas, e **só comece a editar depois da resposta**. Não editar por conta antes de ter as respostas.
+Conforme a resposta 1:
+- **a) referência** → Caminho 1. Pedir o(s) vídeo(s) de referência se ele ainda não mandou.
+- **b) do zero** → Caminho 2. Fazer as perguntas de `references/editar-do-zero.md` (numa mensagem só).
+- **c) padrão Tessmann** → Caminho 3, com as perguntas dele: Reels, criativo ou YouTube; se criativo, tela dividida
+  ou inteira; formatos (criativo sai em até quatro; Reels e YouTube são um formato só).
 
-> **2. É Reels, criativo (anúncio) ou YouTube?**
-> **3.** — se **criativo**: **tela dividida ou tela inteira?**
->    - *dividida* = gancho de ~4 s com material real embaixo e título na divisória, depois tela cheia.
->    - *inteira* = tela cheia do primeiro ao último quadro, sem material embaixo.
->    — se **Reels**: o padrão Tessmann já é dividida no começo virando tela cheia em ~60 % do vídeo. Só confirmar se ele quer assim.
->    — se **YouTube**: não tem essa escolha. É apresentador em tela cheia com texto grande por cima, o vídeo inteiro.
-> **4. Formatos.** Criativo sai em até quatro: **RL 1080x1920**, **IN 1080x1350**, **GL 1080x1080**, **YT 1920x1080**. Perguntar quais ele quer. **Reels é um formato só (RL 1080x1920) e YouTube também (1920x1080)** — nesses dois não perguntar.
-> **5. Algo específico?** Título do gancho, material que ele já tem (prints, clipes, logo), trecho para cortar fora, chamada final, se ele mesmo vai pôr a legenda dos primeiros 10 s (Reels/criativo) ou os capítulos (YouTube).
+Regra geral: perguntar pouco e decidir o resto sozinho. **Essas perguntas de abertura são a exceção** — sem elas a
+edição sai errada. **Só começar a editar depois da resposta.** Depois, só voltar a perguntar quando faltar algo que
+muda o resultado (um link, um arquivo, um dado que não dá para inventar).
 
-No **YouTube** a skill não renderiza sozinha: os scripts desta skill fazem vertical. Avisar isso na hora da resposta — o que sai é o corte, a transcrição revisada e o roteiro de edição completo (tempo, elemento, texto, tamanho em px, material a buscar), para ele montar no editor dele. Detalhe em `references/padrao-tessmann-youtube.md`.
-
-Regra geral da skill: perguntar pouco e decidir o resto sozinho. **Essas cinco perguntas são a exceção** — sem elas a edição sai errada. Depois delas, decidir o resto e só voltar a perguntar quando faltar algo que muda o resultado (um link, um arquivo, um dado que não dá para inventar).
-
-## Caminho A — treinar com a referência do aluno
+## Caminho 1 — a partir de uma referência
 
 1. Pedir a referência: **um a três vídeos** do estilo que ele quer (editados por ele ou que ele gosta), e de preferência no mesmo formato do vídeo que vai ser editado.
 2. Medir seguindo `references/treinar-com-referencia.md` — passo a passo com comandos. **Medir o vídeo inteiro**, nunca dois ou três instantes: amostra pequena já produziu conclusão errada sobre legenda e sobre ritmo.
 3. Escrever o resultado em `references/padrao-do-aluno.md` do projeto dele, usando `references/modelo-padrao-do-aluno.md` como esqueleto. O que não der para medir fica escrito como **"não medido"** — nunca chutado.
 4. Mostrar o padrão medido para ele confirmar (**e perguntar o que a medição não resolve**: nome exato da fonte, assets de transição, se tem música).
-5. Editar seguindo esse arquivo. A cada correção dele, atualizar o `padrao-do-aluno.md` — é a memória do estilo dele.
+5. Mostrar 3 quadros de teste no estilo medido antes do vídeo inteiro.
+6. Editar seguindo esse arquivo, com a ferramenta que reproduz o estilo (tabela em **Ferramentas**: legenda e cortes → pipeline Python ou Remotion; motion e telas animadas → HyperFrames). A cada correção dele, atualizar o `padrao-do-aluno.md` — é a memória do estilo dele.
 
 **Limite**: a referência serve para extrair **estilo** (tipografia, ritmo, layout, cor, transição). Não reaproveitar o conteúdo dela — clipes, música, prints, lettering — no vídeo do aluno.
 
-## Caminho B — padrão Tiago Tessmann
+## Caminho 2 — do zero (o aluno descreve)
+
+Seguir `references/editar-do-zero.md`: transformar a descrição em especificação com números, mostrar 3 quadros de
+teste (ou 5–10 s) e só então editar o vídeo inteiro. Escolher a ferramenta pelo pedido (tabela no fim do arquivo).
+Cada correção dele vai para `references/padrao-do-aluno.md` — vira o padrão dele para as próximas.
+
+## Caminho 3 — padrão Tiago Tessmann
 
 - **Reels** → `references/padrao-tessmann-reels.md`
 - **Criativos (anúncios)** → `references/padrao-tessmann-criativos.md`
 - **YouTube (16:9)** → `references/padrao-tessmann-youtube.md`
 
+O YouTube 16:9 é montado no Remotion (`work/modelos/remotion-modelo`, `largura` 1920 / `altura` 1080) seguindo as medidas do arquivo de padrão; Reels e criativo usam o pipeline Python (`references/pipeline-tecnico.md`).
+
 São os três padrões medidos nas edições originais. Em caso de conflito entre eles e qualquer outra coisa escrita aqui, vale o arquivo do padrão.
 
-## Regras que valem nos dois caminhos e nos três padrões
+## Regras que valem em todos os caminhos
 
 ### Corte e áudio
 1. **Cortar só silêncio de verdade.** Detector relativo ao piso de ruído (`scripts/cortar_silencios.py`), corte sempre dentro do silêncio, com margem preservada nas bordas. **Nunca** cortar usando timestamp de palavra da transcrição — foi assim que cortes começaram a comer o fim das palavras. Rodar a conferência depois.
@@ -102,19 +138,23 @@ Entregar só depois de conferir. Se alguma coisa ficou fora do padrão e não de
 
 ## Ferramentas
 
-`references/pipeline-tecnico.md` tem a instalação e o passo a passo de rodar o pipeline (corte, transcrição, rastreio de rosto, render) com os scripts em `scripts/`:
+Tudo instalado pelo Passo 0. Qual usar:
 
-| script | o que faz |
+| pedido | ferramenta |
 |---|---|
-| `cortar_silencios.py` | detecta os respiros e monta a lista de segmentos |
-| `criativo_prep.py` | corta, gera o `base.mov`, trata a voz, transcreve e rastreia o rosto |
-| `criativo.py` | renderiza criativo (dividida/inteira) nos quatro formatos |
-| `reels2.py` | renderiza Reels (dividida → transição → tela cheia) |
-| `baixar.py` | baixa trecho de vídeo do YouTube/TikTok/Instagram para a área de cima |
-| `exemplo-criativo.py`, `exemplo-reel.py` | configs reais, para copiar e adaptar |
+| cortar silêncio, juntar, converter, extrair quadro/áudio | ffmpeg |
+| transcrição e legenda palavra por palavra | Whisper — `work/transcrever.py` |
+| baixar trecho de vídeo da internet (com autorização do aluno) | yt-dlp — `work/baixar.py` |
+| Reels/criativo no padrão Tessmann | pipeline Python — `criativo_prep.py`, `reels2.py`, `criativo.py` (`references/pipeline-tecnico.md`) |
+| montagem completa: tela dividida, inserts, legenda, YouTube 16:9 | Remotion — `work/modelos/remotion-modelo` |
+| tela de app recriada com cursor, cartões, contadores, lettering animado | HyperFrames — `work/modelos/hyperframes-modelo` |
+| texto/imagem passando atrás da pessoa | `work/recortar_pessoa.py` + Remotion ou HyperFrames |
+| conferir enquadramento e ritmo | `work/folha.py` (folha de contato) |
 
-**O padrão YouTube não tem script aqui**: ele é 16:9 e os renderizadores desta skill são verticais. Nesse caso a entrega é o corte, a transcrição revisada e o roteiro de edição — e o aluno monta no editor dele (ou implementa em Remotion, que é como o original foi feito).
+Detalhes, comandos e as regras que quebram o render: `references/ferramentas.md`.
 
-Nada disso é obrigatório: se o aluno editar no Premiere, CapCut ou DaVinci, os arquivos de padrão continuam valendo como especificação (tamanho de fonte, posição, tempos, ritmo) e a skill vira o roteiro de edição dele — plano de cena por cena com os tempos, os blocos de legenda já quebrados e a lista de material a buscar.
+Se o aluno edita no Premiere, CapCut ou DaVinci, a skill pode entregar o roteiro de edição em vez do MP4 — cena
+por cena, com tempos, a legenda já quebrada e a lista de material a buscar.
 
-Se o ambiente não renderizar vídeo, dizer isso e entregar o projeto e o plano executável — sem afirmar que entregou um MP4 pronto.
+Se o ambiente não conseguir renderizar vídeo (ex.: Claude no navegador, sem acesso ao computador), dizer isso e
+entregar o projeto e o plano executável — sem afirmar que entregou um MP4 pronto.

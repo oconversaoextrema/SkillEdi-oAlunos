@@ -1,0 +1,39 @@
+<!doctype html>
+<!-- Modelo HyperFrames: vídeo da pessoa + cartão animado + legenda palavra por palavra.
+     Copie esta pasta para work/<id>/hf/, ponha o vídeo em media/ e o gsap.min.js em vendor/ (o novo_projeto.py já faz isso).
+     Regras do HyperFrames que mais dão erro:
+       - todo <video>/<audio> com data-start PRECISA de id (sem id ele congela no render);
+       - não pôr data-start no pai E no <video> filho — cronometre só um dos dois;
+       - elemento animado pelo GSAP não pode ter transform no CSS (use tl.fromTo);
+       - a timeline é registrada em window.__timelines["<data-composition-id>"] e começa pausada. -->
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=1080, height=1920">
+<style>
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000}
+#root{position:relative;width:1080px;height:1920px;overflow:hidden}
+.clip{position:absolute}
+#pessoa{left:0;top:0;width:1080px;height:1920px;object-fit:cover}
+#cartao{left:90px;top:300px;width:900px;padding:50px;border-radius:40px;background:#111;color:#fff;
+  font:700 72px/1.1 'Helvetica Neue',Arial,sans-serif;letter-spacing:-0.04em}
+.leg{left:40px;width:1000px;top:1190px;text-align:center;color:#fff;font:700 86px/1.02 'Helvetica Neue',Arial,sans-serif;
+  letter-spacing:-0.055em;text-shadow:0 0 3px rgba(0,0,0,.55),0 4px 22px rgba(0,0,0,.55)}
+.leg span{display:inline-block}
+</style></head>
+<body>
+<div id="root" data-composition-id="modelo" data-start="0" data-duration="4" data-fps="30" data-width="1080" data-height="1920">
+  <video id="pessoa" class="clip" src="media/pessoa.mp4" muted playsinline data-start="0" data-duration="4" data-media-start="0"></video>
+  <audio id="voz" src="media/voz.m4a" data-start="0" data-duration="4"></audio>
+  <div id="cartao" class="clip" data-start="0.5" data-duration="2.5">Texto grande que entra suave</div>
+  <div id="lb0" class="clip leg" data-start="0.2" data-duration="1.5"><span id="w0">Edição</span> <span id="w1">de</span></div>
+  <div id="lb1" class="clip leg" data-start="1.7" data-duration="2.3"><span id="w2">teste</span></div>
+</div>
+<script src="vendor/gsap.min.js"></script>
+<script>
+window.__timelines = window.__timelines || {};
+const tl = gsap.timeline({paused: true});
+tl.fromTo('#cartao', {opacity: 0, y: 40}, {opacity: 1, y: 0, duration: 0.4, ease: 'power2.out'}, 0.5);
+[['#w0', 0.2], ['#w1', 0.7], ['#w2', 1.7]].forEach(([s, t]) =>
+  tl.fromTo(s, {opacity: 0, scale: 0.86}, {opacity: 1, scale: 1, duration: 0.12, ease: 'back.out(2.2)'}, t));
+tl.set({}, {}, 4);
+window.__timelines["modelo"] = tl;
+</script>
+</body></html>
