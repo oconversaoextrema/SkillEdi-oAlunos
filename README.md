@@ -14,7 +14,7 @@ Quando você escreve **`editar`**, ela pergunta como você quer editar:
 Baixe o `.zip` (botão **Code → Download ZIP**) ou clone:
 
 ```bash
-git clone https://github.com/ruanhoracio-ue/SkillEdi-oAlunos.git
+git clone https://github.com/oconversaoextrema/SkillEdi-oAlunos.git
 mkdir -p ~/.claude/skills
 cp -R SkillEdi-oAlunos/editor-video-alunos ~/.claude/skills/
 ```
