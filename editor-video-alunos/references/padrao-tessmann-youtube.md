@@ -8,11 +8,81 @@ Formato: **1920x1080, 30 fps**. Um formato só.
 Não confunda com Reels e criativo: aqui **não tem tela dividida em cima/embaixo**, não tem legenda queimada o
 vídeo inteiro e a fonte é outra. Se a edição for YouTube, o que vale é este arquivo.
 
-> **O que a skill entrega neste padrão.** Os scripts em `scripts/` renderizam Reels e criativo (vertical), **não
-> este formato**. Para YouTube a skill entrega: o corte, a transcrição revisada e o **roteiro de edição completo** —
-> bloco por bloco, com o tempo, o tipo de elemento, o texto exato, o tamanho em px e o material a buscar. Você
-> monta no seu editor (Premiere, DaVinci, CapCut) ou implementa em Remotion. Tudo aqui está em px de 1080p, então
-> dá para reproduzir em qualquer editor.
+> **O que a skill entrega neste padrão.** O corte, a transcrição revisada e a montagem em **Remotion** (vídeo
+> 1920x1080) com as animações e telas cheias feitas em **HyperFrames** (WebM com transparência, encaixado por cima).
+> Se o aluno preferir editar no Premiere, DaVinci ou CapCut, a skill entrega o **roteiro de edição completo** —
+> bloco por bloco, com o tempo, o tipo de elemento, o texto exato, o tamanho em px e o material a buscar — mais as
+> animações renderizadas soltas. Tudo aqui está em px de 1080p.
+
+---
+
+## 0. Atualização (outubro/2026) — vale por cima do resto deste arquivo
+
+O padrão base (seções 1 a 7) continua: apresentador em tela cheia, texto grande por cima, painéis, inserts reais.
+Por cima dele **somam** estas camadas, corrigidas vídeo a vídeo. Onde houver conflito, vale esta seção.
+
+### 0.1 Camada 3D (soma ao básico, não substitui)
+- **Recortar o apresentador** (`work/recortar_pessoa.py`) para textos e gráficos passarem **atrás dele** — é o que
+  faz o elemento parecer estar na cena. Texto lateral atrás dele **por padrão**, alternando com blocos limpos.
+- Título com **degradê no próprio texto** (branco → #B9B9B9) revelado por máscara de baixo para cima; **sublinhado
+  fino** (~3,4 % da altura do corpo) que se desenha na palavra-chave.
+- **Sem chapéu/kicker** (a linha pequena em caixa alta em cima do título) — nem nos painéis. Na cartela de virada, o
+  número entra GRANDE ("01") no lugar da linha.
+- Painéis e cartões com **profundidade real** (perspectiva 3D), entrando do fundo e recuando quando o próximo entra.
+
+### 0.2 Edição dinâmica
+- Varrer a transcrição e marcar **tudo que ele cita de concreto** (notícia, lei, empresa, ferramenta, número,
+  pessoa, site, app): cada um vira **insert real** com fonte, ou tela cheia da coisa.
+- Primeiro minuto: **uma troca a cada 3–5 s**, abertura com título curto e grande + animação puxando a fala nos
+  primeiros 3–4 s. Depois: **nunca mais de ~15–20 s** só ele + texto.
+- Variar o tipo (notícia em tela cheia, insert ao lado, cartela, animação, cartão) — não repetir o mesmo seguido.
+
+### 0.3 Telas cheias — 5 modelos
+Toda tela cheia usa um destes, variando ao longo do vídeo, na linguagem de `padrao-tessmann-motion.md`:
+1. **Editorial** — título à esquerda + cards escuros (rótulo, palavra grande, descrição), barra desenhando.
+2. **Dividida** — linha central se desenhando; lado ruim riscado/apagado, lado bom aceso.
+3. **Vidro 3D** — painéis em perspectiva flutuando, ✗/✓.
+4. **Tipografia grande** — palavra apagada × palavra cheia, giro 3D.
+5. **Interface** (preferido quando explica recurso) — janela de app real, cursor clicando, notificações, busca.
+
+Fundo: quase preto + degradê verde sutil num canto + grão. Entra e sai em **corte seco**; **nunca abre vazia** (1º
+elemento grande em ≤ 0,6 s); último elemento ≥ 1,5 s inteiro na tela; respiro ≥ ~140 px em cima e embaixo; **uma
+ideia por tela**. A legenda pílula + frase embaixo **não é obrigatória** — só quando a tela precisa explicar.
+**Nenhuma tela seca**: cartela/tela cheia sempre com texto animado (palavras entrando, sublinhado, movimento).
+
+### 0.4 Ao lado dele (laterais)
+- Não é só título: **lateral animada** na pegada do motion — cartão de interface que **cresce** com os itens (nunca
+  cartão grande vazio esperando a fala), contador, avatares, check, chip riscado. Faixa ≤ ~480–600 px, texto ≥ 40 px.
+- Texto lateral **grande e largo** (lista ~74 px, mín. 56), **nunca uma palavra por linha** — se bater no
+  apresentador, passa atrás dele, não encolhe a coluna.
+- **Lateral parada no máximo ~8–10 s**; fala longa vira várias laterais curtas, uma por ideia.
+- Espaço folgado sempre (≥ 24–40 px entre blocos; título → conteúdo ≥ ~80 px). Nada colado.
+- Animações seguidas do mesmo lado: **o zoom fica**, só troca a animação (sem sair e voltar).
+- Frase longa (> ~26 letras) em **duas linhas equilibradas**, quebrando no sentido.
+
+### 0.5 Textos
+- Maiúscula no início e depois de ? e !. Imperativo certo ("Escreva", "Comente", "Deixe" — nunca "Escreve",
+  "Comenta"). Sem a informalidade da fala ("galera", "tipo"). Sigla com o nome completo.
+- Passo a passo: **todo "Passo N" abre em tela cheia** com o mesmo cabeçalho "Passo N · Título" no topo.
+- Lettering que não acrescenta nada sai. Título depois de tela cheia começa no fim dela; texto sai quando a fala acaba.
+
+### 0.6 Som
+- **Trilha só na abertura**: uma trilha dramática (cara de trailer) que **bate forte já no 0 s**, vai baixando
+  devagar (~8 s) e some no fim da abertura; o resto do vídeo **sem música**. Trilha diferente em cada vídeo.
+- **Efeitos sonoros em toda animação** (pop, whoosh de interface, clique do cursor, tick no check, snap no risco).
+- Botão "Inscreva-se" animado (foto do canal limpa, sem aro; clique + sino) — **nunca por cima de texto**.
+
+### 0.7 Corte e áudio
+- Começa direto na primeira fala. Antes de retomar uma tomada ele costuma bater palma: o trecho começa **depois**
+  do estalo.
+- Cortar gaguejo e autocorreção — mas se o corte de um tropeço fica feio, **manter a fala original**.
+- Corte que termina em "s"/"ch" (fricativa): conferir os agudos, não só a energia — senão "chia".
+- Pulo de posição no meio da frase: cobrir com tela cheia até depois do corte.
+- Cortes na grade de 30 quadros por segundo.
+
+### 0.8 Antes de exportar
+Mandar ao aluno a **folha de quadros das telas cheias** (3 momentos por tela) e esperar o OK; depois render,
+conferir quadros de cada tela nova e de cada corte, e a fala contra a tela.
 
 ---
 
@@ -143,3 +213,6 @@ Versionar: `<título>-v2.mp4`, `-v3.mp4`. Nunca por cima da versão anterior.
 - [ ] Contraste 1,08 aplicado na câmera.
 - [ ] Fim com +1,2 s de respiro e fade de 0,8 s.
 - [ ] Assistir do começo ao fim: cada elemento entra na hora da frase que ele ilustra.
+- [ ] Seção 0: recorte com texto atrás, nenhuma tela seca, nenhuma lateral parada > ~10 s, nenhum kicker.
+- [ ] Trilha só na abertura (forte no 0 s) e efeitos sonoros nas animações.
+- [ ] Inscreva-se fora de cima de texto; Passo N em tela cheia com o mesmo cabeçalho.

@@ -104,6 +104,26 @@ Bom para: telas de app recriadas (WhatsApp, ChatGPT, planilha) com cursor clican
 contadores, lettering grande, colagens. Para posicionar cursor/caixa em cima de um item, colocar a caixa **dentro**
 do elemento-alvo (com `position:relative`) em vez de chutar coordenadas.
 
+## Queima de filme nos cortes
+
+`work/queima_cortes.py` põe uma queima de filme (film burn) em cada corte de cena de um vídeo já renderizado, em
+modo tela (o preto do overlay some). O overlay é do aluno — vídeo de queimas de luz sobre fundo preto.
+
+```bash
+python work/queima_cortes.py render.mp4 cortes.json final.mp4 --overlay meu-overlay.mp4
+```
+
+- `cortes.json` = `{"cortes": [3.17, 5.87, ...], "dur": 76.4}` — os inícios de cena (menos o primeiro), na grade de 1/30 s.
+- Sem `--picos`, ele acha as queimas sozinho (quadros quase brancos). Melhor ainda: olhar o overlay e passar só as
+  queimas com formato (`--picos 10.05,13.35,...`) — as que são branco chapado ficam feias.
+- Overlay deitado em vídeo em pé é girado 90° automaticamente.
+- Aplicar **antes** do fade final e da normalização de áudio.
+
+## HyperFrames: cortes na grade de quadros
+
+Todo `data-start` de cena e todo `data-media-start` de vídeo têm que ser múltiplos de 1/30 s (`round(t*30)/30`).
+Fora da grade (ex. 49,55), o HyperFrames repete 1 quadro a cada 3 do vídeo naquele trecho — fica "travadinho".
+
 ## Recorte da pessoa (texto atrás dela)
 
 `recortar_pessoa.py` gera `.webm` VP9 com alpha. Por cima de um fundo/animação, a pessoa fica na frente e o

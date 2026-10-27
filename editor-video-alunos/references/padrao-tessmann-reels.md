@@ -78,7 +78,7 @@ RUIM: `A cidade despertava` / `lentamente enquanto a` / `chuva fina cobria as` /
 4. **Cada clipe ou imagem aparece uma vez só** no vídeo inteiro. Antes de entregar, olhar a folha de contato procurando repetição.
 5. **Famosos e influenciadores grandes do nicho** no começo e no meio, pegos do TikTok (perfil ou busca) e do YouTube (coberturas). Chamativo, até meio polêmico.
 6. **Empresa ou plataforma citada = rosto do dono / CEO** (foto ou vídeo de entrevista, keynote, coletiva). Tela de sistema só quando a fala é literalmente sobre a tela.
-7. **Fallback**: quando não souber o que colocar, o apresentador no palco (material dele palestrando) é o coringa.
+7. **Imagem sempre do assunto.** O apresentador palestrando **não é coringa** — só entra quando a fala é sobre ele. Faltou material = mais do material oficial do assunto (filme da campanha, perfil oficial da marca, outra versão do mesmo vídeo, tomadas ainda não usadas). Foto de post: a original em resolução cheia, nunca recorte de print de matéria.
 8. **O que está em cima bate com o que está sendo dito naquele instante.** Método: ler a transcrição inteira, listar cada coisa concreta citada (matéria, evento, empresa, ferramenta, número, história) e buscar **aquilo mesmo** — a matéria citada com print legível do trecho certo, o vídeo do evento citado, a tela real da ferramenta citada. Nunca material genérico "do tema". Trocar assim que a fala muda de assunto.
 9. **Print de notícia**: o texto tem que caber inteiro, sem cortar nas bordas.
 10. **Sem música de fundo.**
@@ -104,11 +104,20 @@ Antes de renderizar, extrair o **quadro real** de cada slot no segundo em que el
 
 ---
 
+## 6a. Legenda sobre material claro
+
+Legenda branca em cima de print de matéria ou fundo branco **some**. Sempre que a área perto da legenda for clara,
+entra um **degradê escuro** atrás dela (scrim), e o print é recortado para a divisória cair em espaço vazio, não no
+meio do texto da matéria.
+
+---
+
 ## 7. Abertura
 
 - **Primeiro quadro forte**: b-roll de vídeo da empresa, cena de notícia, algo bom. **Nunca só o logo.**
 - **Os primeiros 10 s não podem ter fundo branco ou claro**, porque o título entra por cima.
 - Sem título de abertura desenhado no render. A legenda começa depois dos 10 s.
+- **Post citado abre o vídeo**: se a fala começa falando de um post (carrossel, foto, vídeo de alguém), os primeiros segundos mostram **o próprio post**, em resolução cheia; quando a fala cita números (curtidas, comentários), entra o post com os números visíveis.
 
 ---
 

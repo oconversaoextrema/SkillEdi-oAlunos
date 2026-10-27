@@ -1,6 +1,6 @@
 ---
 name: editor-video-alunos
-description: Editor de vídeo completo para alunos do Tiago Tessmann — instala sozinho todas as ferramentas (ffmpeg, Whisper, yt-dlp, Remotion, HyperFrames, recorte de pessoa, fontes) e edita Reels, criativos e YouTube a partir de uma referência que o aluno manda, do zero pela descrição dele, ou no padrão do Tiago Tessmann. Use quando o aluno escrever "editar", "edita esse vídeo", mandar um bruto ou uma referência de edição, ou pedir para instalar/configurar as ferramentas de edição.
+description: Editor de vídeo completo para alunos do Tiago Tessmann — instala sozinho todas as ferramentas (ffmpeg, Whisper, yt-dlp, Remotion, HyperFrames, recorte de pessoa, fontes) e edita Reels (tela dividida e roteirizado), criativos, YouTube e motion a partir de uma referência que o aluno manda, do zero pela descrição dele, ou no padrão do Tiago Tessmann. Use quando o aluno escrever "editar", "edita esse vídeo", mandar um bruto ou uma referência de edição, ou pedir para instalar/configurar as ferramentas de edição.
 ---
 
 # Editor de vídeo — alunos
@@ -38,27 +38,36 @@ Antes de rodar qualquer coisa no terminal: `source ~/.editor-video/ambiente.sh` 
 
 ## A PRIMEIRA PERGUNTA — sempre esta
 
-Quando o aluno escreve "editar" (ou manda um bruto, ou pede uma edição), a primeira coisa é perguntar:
+Quando o aluno escreve "editar" (ou "edita esse vídeo", manda um bruto, pede uma edição), a primeira mensagem é
+esta, numa mensagem só:
 
-> **1. Como você quer editar?**
-> **a) A partir de uma referência** — você me manda um vídeo editado do jeito que você gosta e eu copio o estilo.
+> **1. Qual estilo de edição?**
+> **a) Com referência** — você me manda 1 a 3 vídeos editados do jeito que você gosta e eu copio o estilo.
 > **b) Do zero** — você me explica como imagina a edição e eu monto.
-> **c) No padrão do Tiago Tessmann** — a edição que a gente usa nos vídeos do Tiago, já pronta.
+> **c) Estilo Tiago Tessmann** — as edições que a gente usa nos vídeos do Tiago, já prontas.
+>
+> **2. Qual é o vídeo?** Me manda o bruto (arquivo do vídeo gravado) — ou o caminho dele no computador.
+> **3. Algo específico?** Título, material que você já tem (prints, vídeos, logo), trecho para cortar, chamada final.
 
 Se já existir um `references/padrao-do-aluno.md` no projeto dele, oferecer também: *"achei um padrão seu já
 treinado (`<nome>`, de `<data>`) — uso ele?"*
 
-E na mesma mensagem, numeradas:
+Se a resposta for **c) Estilo Tiago**, a segunda pergunta é:
 
-> **2. Qual é o vídeo?** Me manda o bruto (arquivo do vídeo gravado) — ou o caminho dele no computador.
-> **3. Onde vai postar?** Reels/TikTok/Shorts (1080x1920), feed (1080x1350), quadrado (1080x1080), YouTube (1920x1080). Pode ser mais de um.
-> **4. Algo específico?** Título, material que você já tem (prints, vídeos, logo), trecho para cortar, chamada final.
+> **Qual edição do Tiago?**
+> **1. Criativo (anúncio)** — e aí: tela dividida ou inteira? Quais formatos (até quatro: 1080x1920, 1080x1350, 1080x1080, 1920x1080)?
+> **2. Reels com tela dividida** — material real em cima (notícia, famoso, print, vídeo), você embaixo.
+> **3. Reels roteirizado (tutorial)** — material em cima em largura total, legenda palavra por palavra, telas de app com cursor.
+> **4. YouTube (16:9)** — vídeo longo, você em tela cheia com texto, animações e inserts.
+> **5. Motion** — vídeo animado de produto, app ou serviço (estilo "prévia premium"), com narração.
+
+Se a resposta for **a)** ou **b)**, perguntar também **onde vai postar**: Reels/TikTok/Shorts (1080x1920), feed
+(1080x1350), quadrado (1080x1080) ou YouTube (1920x1080) — pode ser mais de um.
 
 Conforme a resposta 1:
 - **a) referência** → Caminho 1. Pedir o(s) vídeo(s) de referência se ele ainda não mandou.
 - **b) do zero** → Caminho 2. Fazer as perguntas de `references/editar-do-zero.md` (numa mensagem só).
-- **c) padrão Tessmann** → Caminho 3, com as perguntas dele: Reels, criativo ou YouTube; se criativo, tela dividida
-  ou inteira; formatos (criativo sai em até quatro; Reels e YouTube são um formato só).
+- **c) estilo Tiago** → Caminho 3, com o arquivo de padrão da opção escolhida.
 
 Regra geral: perguntar pouco e decidir o resto sozinho. **Essas perguntas de abertura são a exceção** — sem elas a
 edição sai errada. **Só começar a editar depois da resposta.** Depois, só voltar a perguntar quando faltar algo que
@@ -81,15 +90,19 @@ Seguir `references/editar-do-zero.md`: transformar a descrição em especificaç
 teste (ou 5–10 s) e só então editar o vídeo inteiro. Escolher a ferramenta pelo pedido (tabela no fim do arquivo).
 Cada correção dele vai para `references/padrao-do-aluno.md` — vira o padrão dele para as próximas.
 
-## Caminho 3 — padrão Tiago Tessmann
+## Caminho 3 — estilo Tiago Tessmann
 
-- **Reels** → `references/padrao-tessmann-reels.md`
-- **Criativos (anúncios)** → `references/padrao-tessmann-criativos.md`
-- **YouTube (16:9)** → `references/padrao-tessmann-youtube.md`
+| opção | arquivo de padrão | ferramenta |
+|---|---|---|
+| 1. Criativo (anúncio) | `references/padrao-tessmann-criativos.md` | pipeline Python (`references/pipeline-tecnico.md`) |
+| 2. Reels com tela dividida | `references/padrao-tessmann-reels.md` | pipeline Python |
+| 3. Reels roteirizado (tutorial) | `references/padrao-tessmann-reels-roteirizado.md` | HyperFrames (`work/modelos/hyperframes-modelo`) + `work/queima_cortes.py` |
+| 4. YouTube (16:9) | `references/padrao-tessmann-youtube.md` | Remotion (`work/modelos/remotion-modelo`, 1920x1080) + HyperFrames nas animações |
+| 5. Motion | `references/padrao-tessmann-motion.md` | HyperFrames |
 
-O YouTube 16:9 é montado no Remotion (`work/modelos/remotion-modelo`, `largura` 1920 / `altura` 1080) seguindo as medidas do arquivo de padrão; Reels e criativo usam o pipeline Python (`references/pipeline-tecnico.md`).
-
-São os três padrões medidos nas edições originais. Em caso de conflito entre eles e qualquer outra coisa escrita aqui, vale o arquivo do padrão.
+São padrões medidos e corrigidos nas edições reais. Em caso de conflito entre eles e qualquer outra coisa escrita
+aqui, vale o arquivo do padrão. Dentro de um arquivo de padrão, a seção marcada **"atualização"** vale por cima do
+resto do arquivo.
 
 ## Regras que valem em todos os caminhos
 
@@ -148,6 +161,8 @@ Tudo instalado pelo Passo 0. Qual usar:
 | Reels/criativo no padrão Tessmann | pipeline Python — `criativo_prep.py`, `reels2.py`, `criativo.py` (`references/pipeline-tecnico.md`) |
 | montagem completa: tela dividida, inserts, legenda, YouTube 16:9 | Remotion — `work/modelos/remotion-modelo` |
 | tela de app recriada com cursor, cartões, contadores, lettering animado | HyperFrames — `work/modelos/hyperframes-modelo` |
+| motion de produto/app (estilo prévia premium) | HyperFrames — `references/padrao-tessmann-motion.md` |
+| queima de filme (film burn) em todos os cortes | `work/queima_cortes.py` (overlay do aluno) |
 | texto/imagem passando atrás da pessoa | `work/recortar_pessoa.py` + Remotion ou HyperFrames |
 | conferir enquadramento e ritmo | `work/folha.py` (folha de contato) |
 
