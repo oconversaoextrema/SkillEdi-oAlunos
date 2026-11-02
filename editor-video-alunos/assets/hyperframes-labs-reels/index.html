@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="pt-BR" data-resolution="portrait">
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=1080, height=1920" />
+<!-- 02/11/2026: Reels Roteirizado V2 "Público semelhante de quem comprou" no estilo LABS (modelo aprovado labs-b2a, 16:9)
+     adaptado pra 9:16. Só as cenas de motion; o Tiago em tela cheia, as transições e o acabamento (retícula, aberração,
+     glow) entram no work/labs-reel-v02/compor.py. Tempos = tempo de saída do V2 (palavras de work/roteirizado/v02/palavras.json).
+     Zona útil do Reels: y 300–1480 (o Instagram cobre o topo e a legenda/botões embaixo). -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=block" rel="stylesheet">
+<script src="vendor/gsap.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:1080px; height:1920px; overflow:hidden; background:#000; }
+#root { width:100%; height:100%; position:relative; font-family:Inter, sans-serif; color:#F6EADC; }
+:root { --coral:#D97724; --coral2:#F2A65A; --cv:#D97724; --ok:#3FBF7F; --no:#E5484D; }
+.sc { position:absolute; inset:0; opacity:0; overflow:hidden; display:none; }
+/* tela dividida: só a metade de cima (1080x960) aparece; o fundo é calculado pra essa metade e o conteúdo é reduzido pra caber em y 270–930 */
+.sc.dv { background-size:1080px 960px; background-repeat:no-repeat; }
+/* na dividida tudo é reduzido: rótulos pequenos ganham corpo pra continuarem legíveis no celular */
+.dv .k { font-size:46px; letter-spacing:.24em; } .dv .lab { font-size:48px; } .dv .chip { font-size:40px; }
+.dv #m23g { transform:scale(.6); transform-origin:50% 0; }
+.cam { position:absolute; inset:0; transform-origin:50% 46%; }
+/* fundos medidos na referência (gradientes redimensionados pro vertical) */
+.marrom { background:radial-gradient(1000px 700px at 50% 0%, rgba(217,119,36,.16), transparent 70%), radial-gradient(900px 900px at 50% 100%, rgba(140,79,43,.30), transparent 70%), radial-gradient(1100px 1500px at 50% 48%, #2A1A0F 0%, #1A120B 55%, #0B0704 100%); }
+.azul { background:radial-gradient(1000px 800px at 50% 10%, rgba(140,79,43,.38), transparent 70%), radial-gradient(1100px 1500px at 50% 45%, #33200F 0%, #21150C 55%, #0E0906 100%); }
+.creme { background:radial-gradient(900px 800px at 40% 25%, rgba(217,119,36,.22), transparent 70%), radial-gradient(1100px 1500px at 55% 50%, #4A2C17 0%, #2C1A0E 60%, #120B06 100%); color:#F6EADC; }
+.preto { background:radial-gradient(1100px 1500px at 50% 50%, #1C130C 0%, #110B07 60%, #070504 100%); }
+.po { position:absolute; border-radius:50%; }
+.sq { position:absolute; width:200px; height:200px; border-radius:52px; display:flex; align-items:center; justify-content:center; opacity:0;
+  background:linear-gradient(160deg, #4A2E1B 0%, #2E1C10 55%, #1E130B 100%);
+  box-shadow:0 30px 60px rgba(0,0,0,.55), 0 8px 18px rgba(0,0,0,.4), inset 0 2px 0 rgba(255,255,255,.12), inset 0 -6px 14px rgba(0,0,0,.35); }
+
+.sq .in { width:58%; height:58%; border-radius:30%; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(160deg, #EE9A4A, #D97724 60%, #B8611B); box-shadow:0 10px 26px rgba(217,119,36,.45), inset 0 2px 0 rgba(255,255,255,.35); }
+.sq .in svg { width:56%; height:56%; stroke:#fff; }
+.sq.lisa .in { background:none; box-shadow:none; }
+.sq.lisa .in svg { stroke:var(--coral); width:72%; height:72%; }
+.lab { position:absolute; font-size:36px; font-weight:600; text-align:center; width:320px; opacity:0; color:#F5E8DA; }
+.serif { font-family:Newsreader, Georgia, serif; font-weight:400; letter-spacing:-.01em; }
+.k { font-size:30px; font-weight:600; letter-spacing:.3em; text-transform:uppercase; color:var(--coral); }
+.ctr { position:absolute; left:0; width:1080px; text-align:center; }
+.badge { position:absolute; width:72px; height:72px; border-radius:50%; display:flex; align-items:center; justify-content:center; opacity:0;
+  box-shadow:0 8px 20px rgba(0,0,0,.4), inset 0 2px 0 rgba(255,255,255,.3); }
+.badge svg { width:58%; height:58%; stroke:#fff; stroke-width:3.2; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+.badge.no { background:linear-gradient(160deg,#F06A6E,#D63C42); }
+.badge.ok { background:linear-gradient(160deg,#EE9A4A,#D97724); }
+.card { position:absolute; border-radius:36px; opacity:0;
+  background:linear-gradient(160deg, rgba(96,58,32,.78), rgba(48,30,17,.84)); border:1.5px solid rgba(255,255,255,.14);
+  box-shadow:0 40px 80px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.12); }
+
+.branco { position:absolute; border-radius:40px; background:#FBF1E4; opacity:0; color:#1E1A1A;
+  box-shadow:0 50px 90px rgba(20,10,4,.22), 0 6px 18px rgba(20,10,4,.12); }
+.jan { position:absolute; border-radius:30px; background:#1E140D; border:1.5px solid rgba(255,255,255,.12); opacity:0; overflow:hidden;
+  box-shadow:0 60px 120px rgba(0,0,0,.55); color:#F0E2D2; }
+.jan .bar { height:60px; display:flex; align-items:center; gap:10px; padding:0 26px; border-bottom:1px solid rgba(255,255,255,.07); font-size:24px; color:#B0906F; }
+.jan .bar i { width:14px; height:14px; border-radius:50%; display:inline-block; background:#4A3324; }
+.linha { position:absolute; height:3px; background:linear-gradient(90deg, rgba(217,119,36,.2), var(--coral)); transform-origin:left center; transform:scaleX(0); border-radius:2px; }
+.chip { position:absolute; padding:12px 26px; border-radius:40px; font-size:28px; font-weight:700; letter-spacing:.2em; opacity:0;
+  border:2px solid var(--coral); color:var(--coral); background:rgba(217,119,36,.08); }
+.cur { position:absolute; width:52px; height:52px; opacity:0; z-index:20; }
+.px { position:absolute; width:16px; height:16px; background:#F2D3B0; opacity:0; }
+.c { display:none; }
+.row { position:relative; display:flex; align-items:center; gap:22px; height:96px; padding:0 26px; border-radius:20px; border:2px solid transparent; opacity:0; }
+.av { width:60px; height:60px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:700; color:#fff; }
+.bt { display:inline-flex; align-items:center; justify-content:center; height:76px; padding:0 34px; border-radius:20px; font-size:30px; font-weight:600; }
+.tb td { padding:0 18px; height:78px; font-size:27px; border-bottom:1.5px solid #EFDCC6; white-space:nowrap; }
+.tb th { padding:0 18px; height:78px; font-size:24px; font-weight:700; color:#9C7A5C; text-align:left; letter-spacing:.06em; text-transform:uppercase; border-bottom:2px solid #E6CFB5; }
+</style></head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="95.53" data-width="1080" data-height="1920">
+
+<!-- M1 0–1.8 · "Se você cria público na Meta" -->
+<div class="sc marrom" id="m1"><div class="cam">
+  <div class="sq" id="m1q" style="left:400px; top:560px; width:280px; height:280px; border-radius:72px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-users"/></svg></div></div>
+  <div class="k ctr" id="m1k" style="top:930px; opacity:0;">Na Meta</div>
+  <div class="serif ctr" id="m1t" style="top:985px; font-size:170px; line-height:1; opacity:0;">Público</div>
+</div></div>
+
+<!-- M2 1.8–4.5 · curtiu, comentou ou clicou -->
+<div class="sc azul" id="m2"><div class="cam" id="c2">
+  <div class="k ctr" id="m2k" style="top:560px; opacity:0;">A partir de quem</div>
+</div></div>
+
+<!-- M3 6.3–8.5 · pessoas parecidas com os curiosos -->
+<div class="sc marrom" id="m3"><div class="cam" id="c3">
+  <div class="k ctr" id="m3k" style="top:470px; opacity:0;">Pessoas parecidas com</div>
+  <div class="serif ctr" id="m3t" style="top:1260px; font-size:150px; line-height:1; opacity:0;">os <span style="color:var(--coral)">curiosos</span></div>
+</div></div>
+
+<!-- M4 8.5–10.2 · clique não paga a conta -->
+<div class="sc creme" id="m4"><div class="cam">
+  <div class="branco" id="m4c" style="left:170px; top:560px; width:740px; height:620px; padding:60px 64px;">
+    <div style="font-size:30px; font-weight:700; letter-spacing:.2em; color:#9C7A5C;">RESULTADO</div>
+    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-top:40px;"><span style="font-size:40px; font-weight:600;">Cliques</span><span class="serif" style="font-size:96px; line-height:1;"><span id="m4n">0</span></span></div>
+    <div style="height:2px; background:#EFDCC6; margin:34px 0;"></div>
+    <div style="display:flex; justify-content:space-between; align-items:baseline;"><span style="font-size:40px; font-weight:600;">Vendas</span><span class="serif" style="font-size:96px; line-height:1; color:var(--no);">R$ 0</span></div>
+  </div>
+  <svg class="cur" id="m4m" viewBox="0 0 24 24" style="left:720px; top:1240px;"><path d="M4 2 L4 19 L8.5 14.8 L11.6 21.4 L14.2 20.2 L11.1 13.7 L17 13.5 Z" fill="#fff" stroke="#111" stroke-width="1.3" stroke-linejoin="round"/></svg>
+  <div class="badge no" id="m4x" style="left:840px; top:1060px; width:110px; height:110px;"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></div>
+  <div class="serif ctr" id="m4t" style="top:1260px; font-size:84px; opacity:0;">não paga a <span style="color:var(--no)">conta</span></div>
+</div></div>
+
+<!-- M5 12.0–14.3 · seu público tem que nascer de quem comprou -->
+<div class="sc preto" id="m5"><div class="cam">
+  <div class="sq" id="m5q" style="left:410px; top:520px; width:260px; height:260px; border-radius:68px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bag"/></svg></div></div>
+  <div class="k ctr" id="m5k" style="top:880px; opacity:0;">O seu público nasce de</div>
+  <div class="serif ctr" id="m5t" style="top:940px; font-size:150px; line-height:1.02; opacity:0;">quem<br><span style="color:var(--coral)">comprou</span></div>
+</div></div>
+
+<!-- M6 14.3–16.0 · Passo 1 -->
+<div class="sc preto" id="m6"><div class="cam">
+  <div class="serif" id="m6t" style="position:absolute; left:120px; top:560px; font-size:190px; line-height:1; opacity:0;">Passo <span style="color:var(--coral)">1</span></div>
+  <div class="k" id="m6k" style="position:absolute; left:128px; top:790px; opacity:0;">Exportar a lista</div>
+  <div class="sq" id="m6a" style="left:170px; top:960px; width:240px; height:240px; border-radius:62px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-db"/></svg></div></div>
+  <div class="linha" id="m6l" style="left:430px; top:1079px; width:220px;"></div>
+  <div class="sq lisa" id="m6b" style="left:670px; top:960px; width:240px; height:240px; border-radius:62px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-file"/></svg></div></div>
+</div></div>
+
+<!-- M7 17.4–20.4 · exporta do seu CRM a lista de quem já comprou -->
+<div class="sc azul" id="m7"><div class="cam">
+  <div class="chip" id="m7k" style="left:410px; top:330px;">SEU CRM</div>
+  <div class="jan" id="m7j" style="left:90px; top:430px; width:900px; height:1000px;">
+    <div class="bar"><i></i><i></i><i></i><span style="margin-left:18px;">Clientes</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:34px 40px 18px;">
+      <div style="font-size:40px; font-weight:700;">Compraram</div>
+      <div class="bt" id="m7b" style="background:#3D2314; border:2px solid rgba(255,255,255,.12); color:#F0E2D2; gap:14px;"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-down"/></svg>Exportar</div>
+    </div>
+    <div id="m7r" style="padding:0 26px;"></div>
+  </div>
+  <svg class="cur" id="m7m" viewBox="0 0 24 24" style="left:520px; top:1200px;"><path d="M4 2 L4 19 L8.5 14.8 L11.6 21.4 L14.2 20.2 L11.1 13.7 L17 13.5 Z" fill="#fff" stroke="#111" stroke-width="1.3" stroke-linejoin="round"/></svg>
+</div></div>
+
+<!-- M8 20.4–24.2 · nome, e-mail e telefone numa planilha -->
+<div class="sc creme" id="m8"><div class="cam">
+  <div class="branco" id="m8c" style="left:70px; top:470px; width:940px; height:820px; padding:40px 30px; overflow:hidden;">
+    <div style="display:flex; align-items:center; gap:18px; padding:0 18px 26px;">
+      <div style="width:64px; height:64px; border-radius:18px; background:linear-gradient(160deg,#EE9A4A,#D97724); display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-table"/></svg></div>
+      <div style="font-size:38px; font-weight:700;">clientes.csv</div></div>
+    <table class="tb" style="border-collapse:collapse; width:100%;">
+      <tr><th id="m8h1" style="opacity:0">Nome</th><th id="m8h2" style="opacity:0">E-mail</th><th id="m8h3" style="opacity:0">Telefone</th></tr>
+      <tbody id="m8r"></tbody>
+    </table>
+  </div>
+  <div class="chip" id="m8s" style="left:370px; top:1350px; background:#FFF;">SALVO</div>
+  <div class="badge ok" id="m8ok" style="left:610px; top:1338px;"><svg viewBox="0 0 24 24"><use href="#i-ok"/></svg></div>
+</div></div>
+
+<!-- M9 24.2–26.7 · Passo 2 -->
+<div class="sc preto" id="m9"><div class="cam">
+  <div class="serif" id="m9t" style="position:absolute; left:120px; top:560px; font-size:190px; line-height:1; opacity:0;">Passo <span style="color:var(--coral)">2</span></div>
+  <div class="k" id="m9k" style="position:absolute; left:128px; top:790px; opacity:0;">Gerenciador de anúncios</div>
+  <div class="sq" id="m9a" style="left:170px; top:960px; width:240px; height:240px; border-radius:62px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-table"/></svg></div></div>
+  <div class="linha" id="m9l" style="left:430px; top:1079px; width:220px;"></div>
+  <div class="sq lisa" id="m9b" style="left:670px; top:960px; width:240px; height:240px; border-radius:62px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-users"/></svg></div></div>
+</div></div>
+
+<!-- M10 26.7–31.0 · Públicos > Criar público > Personalizado > Lista de clientes -->
+<div class="sc marrom" id="m10"><div class="cam">
+  <div class="jan" id="m10j" style="left:90px; top:400px; width:900px; height:1060px;">
+    <div class="bar"><i></i><i></i><i></i><span style="margin-left:18px;">Gerenciador de anúncios › Públicos</span></div>
+    <div style="padding:36px 40px 0; display:flex; justify-content:space-between; align-items:center;">
+      <div class="serif" style="font-size:64px;">Públicos</div>
+      <div class="bt" id="m10b" style="background:var(--coral); color:#fff;">+ Criar público</div></div>
+    <div id="m10menu" style="position:absolute; left:330px; top:220px; width:530px; border-radius:22px; background:#2A1C12; border:1.5px solid rgba(255,255,255,.12); box-shadow:0 30px 60px rgba(0,0,0,.5); padding:14px; opacity:0;">
+      <div class="op" id="m10o1" style="padding:24px 24px; border-radius:16px; font-size:32px; font-weight:600; border:2px solid transparent;">Público personalizado</div>
+      <div class="op" style="padding:24px 24px; border-radius:16px; font-size:32px; color:#C4A486;">Público semelhante</div>
+      <div class="op" style="padding:24px 24px; border-radius:16px; font-size:32px; color:#C4A486;">Público salvo</div></div>
+    <div id="m10src" style="position:absolute; left:40px; top:200px; width:820px; opacity:0;">
+      <div style="font-size:30px; color:#C4A486; margin:8px 0 22px;">Escolha a origem</div>
+    </div>
+  </div>
+  <svg class="cur" id="m10m" viewBox="0 0 24 24" style="left:500px; top:1300px;"><path d="M4 2 L4 19 L8.5 14.8 L11.6 21.4 L14.2 20.2 L11.1 13.7 L17 13.5 Z" fill="#fff" stroke="#111" stroke-width="1.3" stroke-linejoin="round"/></svg>
+</div></div>
+
+<!-- M11 31.0–33.6 · sobe a planilha na Meta -->
+<div class="sc azul" id="m11"><div class="cam">
+  <div class="card" id="m11f" style="left:330px; top:420px; width:420px; height:150px;">
+    <div style="position:absolute; left:26px; top:25px; width:100px; height:100px; border-radius:26px; background:linear-gradient(160deg,#4A2E1B,#2E1C10); display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="#D97724" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-table"/></svg></div>
+    <div style="position:absolute; left:150px; top:50px; font-size:38px; font-weight:700;">clientes.csv</div></div>
+  <svg style="position:absolute; left:340px; top:720px; width:400px; height:400px; overflow:visible;" viewBox="0 0 200 200">
+    <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="9" id="m11bg" opacity="0"/>
+    <circle id="m11arc" cx="100" cy="100" r="88" fill="none" stroke="#D97724" stroke-width="9" stroke-linecap="round" stroke-dasharray="552.92" stroke-dashoffset="552.92" transform="rotate(-90 100 100)"/></svg>
+  <div class="sq" id="m11q" style="left:430px; top:810px; width:220px; height:220px; border-radius:58px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-up"/></svg></div></div>
+  <div class="serif ctr" id="m11n" style="top:1190px; font-size:120px; line-height:1; opacity:0;"><span id="m11v">0</span><span style="font-size:60px; color:var(--coral);">%</span></div>
+  <div class="k ctr" id="m11k" style="top:1340px; opacity:0;">Enviando pra Meta</div>
+</div></div>
+
+<!-- M12 35.4–39.7 · cruza os dados: Instagram, Facebook -->
+<div class="sc marrom" id="m12"><div class="cam">
+  <div class="k ctr" id="m12k" style="top:340px; opacity:0;">Cruzando os dados</div>
+  <div class="card" id="m12c" style="left:190px; top:420px; width:700px; height:330px; padding:30px 36px;"></div>
+  <div style="position:absolute; left:540px; top:770px; transform:rotate(129deg); transform-origin:0 0;"><div class="linha" id="m12l1" style="left:0; top:0; width:270px;"></div></div>
+  <div style="position:absolute; left:540px; top:770px; transform:rotate(51deg); transform-origin:0 0;"><div class="linha" id="m12l2" style="left:0; top:0; width:270px;"></div></div>
+  <div class="sq" id="m12a" style="left:230px; top:1000px; width:230px; height:230px; border-radius:60px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-insta"/></svg></div></div>
+  <div class="lab" id="m12al" style="left:185px; top:1260px;">Instagram</div>
+  <div class="sq" id="m12b" style="left:620px; top:1000px; width:230px; height:230px; border-radius:60px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-fb"/></svg></div></div>
+  <div class="lab" id="m12bl" style="left:575px; top:1260px;">Facebook</div>
+</div></div>
+
+<!-- M13 41.0–42.8 · Passo 3 -->
+<div class="sc preto" id="m13"><div class="cam">
+  <div class="serif" id="m13t" style="position:absolute; left:120px; top:560px; font-size:190px; line-height:1; opacity:0;">Passo <span style="color:var(--coral)">3</span></div>
+  <div class="k" id="m13k" style="position:absolute; left:128px; top:790px; opacity:0;">Público semelhante</div>
+  <div class="sq" id="m13a" style="left:170px; top:960px; width:240px; height:240px; border-radius:62px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-users"/></svg></div></div>
+  <div class="linha" id="m13l" style="left:430px; top:1079px; width:220px;"></div>
+  <div class="sq lisa" id="m13b" style="left:670px; top:960px; width:240px; height:240px; border-radius:62px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-copy"/></svg></div></div>
+</div></div>
+
+<!-- M14 42.8–45.3 · em cima deste público, criar público semelhante -->
+<div class="sc azul" id="m14"><div class="cam">
+  <div class="jan" id="m14j" style="left:90px; top:500px; width:900px; height:760px;">
+    <div class="bar"><i></i><i></i><i></i><span style="margin-left:18px;">Públicos</span></div>
+    <div style="padding:40px 40px 0;">
+      <div id="m14row" style="display:flex; align-items:center; gap:26px; padding:28px; border-radius:24px; background:#2A1B11; border:2px solid rgba(217,119,36,.0);">
+        <div style="width:96px; height:96px; border-radius:26px; background:linear-gradient(160deg,#EE9A4A,#D97724); display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-table"/></svg></div>
+        <div><div style="font-size:38px; font-weight:700;">Lista de clientes</div><div style="font-size:28px; color:#C4A486; margin-top:6px;">Público personalizado · pronto</div></div></div>
+      <div class="bt" id="m14b" style="margin-top:46px; width:820px; height:110px; font-size:36px; background:#3D2314; border:2px solid rgba(255,255,255,.14); color:#F0E2D2;">Criar público semelhante</div>
+      <div id="m14ok" style="margin-top:44px; display:flex; align-items:center; gap:18px; font-size:32px; color:#F2D3B0; opacity:0;">
+        <div class="badge ok" style="position:relative; opacity:1; width:60px; height:60px;"><svg viewBox="0 0 24 24"><use href="#i-ok"/></svg></div>Público semelhante criado</div>
+    </div>
+  </div>
+  <svg class="cur" id="m14m" viewBox="0 0 24 24" style="left:760px; top:1380px;"><path d="M4 2 L4 19 L8.5 14.8 L11.6 21.4 L14.2 20.2 L11.1 13.7 L17 13.5 Z" fill="#fff" stroke="#111" stroke-width="1.3" stroke-linejoin="round"/></svg>
+</div></div>
+
+<!-- M15 45.3–47.9 · Brasil, começa no 1% -->
+<div class="sc creme" id="m15"><div class="cam">
+  <div class="branco" id="m15c" style="left:110px; top:470px; width:860px; height:860px; padding:56px 60px;">
+    <div style="font-size:28px; font-weight:700; letter-spacing:.2em; color:#9C7A5C;">LOCAL</div>
+    <div style="margin-top:22px; height:100px; border-radius:22px; border:2px solid #E6CFB5; display:flex; align-items:center; gap:18px; padding:0 28px; font-size:38px; font-weight:600;">
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="#D97724" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-pin"/></svg><span id="m15b"></span></div>
+    <div style="font-size:28px; font-weight:700; letter-spacing:.2em; color:#9C7A5C; margin-top:70px;">TAMANHO DO PÚBLICO</div>
+    <div style="position:relative; margin-top:60px; height:14px; border-radius:7px; background:#EFDCC6;">
+      <div id="m15fill" style="position:absolute; left:0; top:0; height:14px; width:0; border-radius:7px; background:var(--coral);"></div>
+      <div id="m15knob" style="position:absolute; left:-22px; top:-22px; width:58px; height:58px; border-radius:50%; background:#fff; border:4px solid var(--coral); box-shadow:0 6px 16px rgba(217,119,36,.35);"></div></div>
+    <div style="display:flex; justify-content:space-between; margin-top:30px; font-size:28px; color:#9C7A5C;"><span>1%</span><span>5%</span><span>10%</span></div>
+    <div class="serif" id="m15n" style="margin-top:46px; font-size:180px; line-height:1; color:var(--coral); opacity:0;">1%</div>
+  </div>
+</div></div>
+
+<!-- M16 47.9–49.7 · o grupo mais parecido -->
+<div class="sc marrom" id="m16"><div class="cam">
+  <div class="po" id="m16r3" style="left:140px; top:440px; width:800px; height:800px; border:2px solid rgba(242,190,140,.25); opacity:0;"></div>
+  <div class="po" id="m16r2" style="left:290px; top:590px; width:500px; height:500px; border:2px solid rgba(242,190,140,.4); opacity:0;"></div>
+  <div class="po" id="m16r1" style="left:415px; top:715px; width:250px; height:250px; background:radial-gradient(circle, rgba(242,166,90,.95), rgba(217,119,36,.75)); box-shadow:0 0 90px rgba(217,119,36,.6); opacity:0;"></div>
+  <div class="serif" style="position:absolute; left:415px; top:790px; width:250px; text-align:center; font-size:84px; line-height:1;" id="m16p">1%</div>
+  <div style="position:absolute; left:470px; top:625px; width:140px; text-align:center; font-size:30px; color:#CDB096;" id="m16p5">5%</div>
+  <div style="position:absolute; left:470px; top:475px; width:140px; text-align:center; font-size:30px; color:#9C7A5C;" id="m16p10">10%</div>
+  <div class="k ctr" id="m16k" style="top:1310px; opacity:0;">O grupo</div>
+  <div class="serif ctr" id="m16t" style="top:1360px; font-size:96px; opacity:0;">mais <span style="color:var(--coral)">parecido</span></div>
+</div></div>
+
+<!-- M17 51.2–53.7 · campanha com público Advantage+ -->
+<div class="sc azul" id="m17"><div class="cam">
+  <div class="k ctr" id="m17k" style="top:520px; opacity:0;">Sua campanha usa</div>
+  <div class="card" id="m17c" style="left:110px; top:610px; width:860px; height:440px;">
+    <div class="sq" style="left:60px; top:110px; width:220px; height:220px; opacity:1; box-shadow:0 20px 40px rgba(0,0,0,.4), inset 0 2px 0 rgba(255,255,255,.12);"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-spark"/></svg></div></div>
+    <div style="position:absolute; left:330px; top:120px; font-size:40px; font-weight:600; color:#EBD9C6;">Público</div>
+    <div class="serif" style="position:absolute; left:326px; top:180px; font-size:98px; line-height:1;">Advantage<span style="color:var(--coral)">+</span></div>
+  </div>
+  <div class="chip" id="m17ia" style="left:400px; top:1110px;">IA DA META</div>
+</div></div>
+
+<!-- M18 53.7–57.1 · semelhante como sugestão de público -->
+<div class="sc marrom" id="m18"><div class="cam">
+  <div class="jan" id="m18j" style="left:90px; top:470px; width:900px; height:820px;">
+    <div class="bar"><i></i><i></i><i></i><span style="margin-left:18px;">Conjunto de anúncios › Público</span></div>
+    <div style="padding:40px 44px 0;">
+      <div style="font-size:30px; color:#C4A486;">Público Advantage+</div>
+      <div style="font-size:42px; font-weight:700; margin-top:10px;">Sugestão de público</div>
+      <div id="m18slot" style="margin-top:40px; height:200px; border-radius:26px; border:3px dashed rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; font-size:30px; color:#8F6E52;">Adicionar sugestão</div>
+    </div>
+  </div>
+  <div id="m18chip" style="position:absolute; left:160px; top:1420px; width:760px; height:150px; border-radius:26px; background:#3D2716; border:2px solid var(--coral); box-shadow:0 30px 60px rgba(0,0,0,.5), 0 0 40px rgba(217,119,36,.3); display:flex; align-items:center; gap:24px; padding:0 30px; opacity:0;">
+    <div style="width:92px; height:92px; border-radius:24px; background:linear-gradient(160deg,#EE9A4A,#D97724); display:flex; align-items:center; justify-content:center; flex:none;"><svg viewBox="0 0 24 24" width="54" height="54" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-copy"/></svg></div>
+    <div><div style="font-size:36px; font-weight:700;">Semelhante (BR, 1%)</div><div style="font-size:26px; color:#C4A486; margin-top:6px;">Lista de clientes</div></div></div>
+  <div class="badge ok" id="m18ok" style="left:880px; top:820px; width:90px; height:90px;"><svg viewBox="0 0 24 24"><use href="#i-ok"/></svg></div>
+  <svg class="cur" id="m18m" viewBox="0 0 24 24" style="left:780px; top:1520px;"><path d="M4 2 L4 19 L8.5 14.8 L11.6 21.4 L14.2 20.2 L11.1 13.7 L17 13.5 Z" fill="#fff" stroke="#111" stroke-width="1.3" stroke-linejoin="round"/></svg>
+</div></div>
+
+<!-- M19 58.8–61.7 · a IA da Meta procura pessoas parecidas com seus clientes -->
+<div class="sc azul" id="m19"><div class="cam" id="c19">
+  <div class="sq" id="m19q" style="left:430px; top:380px; width:220px; height:220px; border-radius:58px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bot"/></svg></div></div>
+  <div id="m19scan" style="position:absolute; left:110px; top:700px; width:860px; height:6px; border-radius:3px; background:linear-gradient(90deg, transparent, var(--coral), transparent); box-shadow:0 0 30px var(--coral); opacity:0;"></div>
+  <div class="k ctr" id="m19k" style="top:1400px; opacity:0;">Parecidas com seus clientes</div>
+</div></div>
+
+<!-- M20 63.1–65.4 · não sobe todo mundo que já comprou -->
+<div class="sc creme" id="m20"><div class="cam">
+  <div class="branco" id="m20c" style="left:110px; top:430px; width:860px; height:900px; padding:40px 34px;">
+    <div style="font-size:28px; font-weight:700; letter-spacing:.2em; color:#9C7A5C; padding:0 20px 18px;">TODOS QUE COMPRARAM</div>
+    <div id="m20r"></div></div>
+  <div class="badge no" id="m20x" style="left:860px; top:380px; width:130px; height:130px;"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></div>
+  <div class="serif ctr" id="m20t" style="top:1380px; font-size:90px; opacity:0;"><span style="color:var(--no)">Não</span> todo mundo</div>
+</div></div>
+
+<!-- M21 65.4–67.6 · só os seus melhores clientes -->
+<div class="sc marrom" id="m21"><div class="cam">
+  <div class="k ctr" id="m21k" style="top:400px; opacity:0;">Sobe só os seus</div>
+  <div class="serif ctr" id="m21t" style="top:450px; font-size:150px; line-height:1; opacity:0;"><span style="color:var(--coral)">melhores</span></div>
+  <div id="m21r" style="position:absolute; left:140px; top:690px; width:800px;"></div>
+</div></div>
+
+<!-- M22 67.6–72.2 · compraram mais vezes, pagaram mais, não pediram desconto -->
+<div class="sc azul" id="m22"><div class="cam" id="c22">
+  <div class="k ctr" id="m22k" style="top:430px; opacity:0;">Melhores clientes</div>
+</div></div>
+
+<!-- M23 72.2–75.3 · no mínimo 100 pessoas por público -->
+<div class="sc creme" id="m23"><div class="cam">
+  <div class="k ctr" id="m23k" style="top:420px; opacity:0;">A Meta pede no mínimo</div>
+  <div class="serif ctr" id="m23n" style="top:470px; font-size:300px; line-height:1; opacity:0;"><span id="m23v">0</span></div>
+  <div class="ctr" id="m23l" style="top:800px; font-size:44px; font-weight:600; opacity:0; color:#C9A27E;">pessoas por público</div>
+  <div id="m23g" style="position:absolute; left:215px; top:920px; width:650px; height:650px;"></div>
+</div></div>
+
+<!-- M24 77.5–80.1 · não vai atrás de qualquer cliente -->
+<div class="sc marrom" id="m24"><div class="cam" id="c24">
+  <div class="badge no" id="m24x" style="left:470px; top:1240px; width:140px; height:140px;"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></div>
+  <div class="serif ctr" id="m24t" style="top:1410px; font-size:96px; opacity:0;">qualquer cliente</div>
+</div></div>
+
+<!-- M25 80.1–83.6 · gente parecida com seu melhor cliente -->
+<div class="sc azul" id="m25"><div class="cam" id="c25">
+  <div class="sq" id="m25q" style="left:415px; top:735px; width:250px; height:250px; border-radius:66px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-star"/></svg></div></div>
+  <div class="k ctr" id="m25k" style="top:1380px; opacity:0;">Parecidos com</div>
+  <div class="serif ctr" id="m25t" style="top:1430px; font-size:84px; opacity:0;">seu <span style="color:var(--coral)">melhor</span> cliente</div>
+</div></div>
+
+<!-- M26 85.7–88.6 · público bom não é o maior, é o mais parecido com quem te paga -->
+<div class="sc preto" id="m26"><div class="cam">
+  <div class="card" id="m26a" style="left:90px; top:520px; width:430px; height:640px;">
+    <div style="position:absolute; left:0; width:430px; top:50px; text-align:center; font-size:34px; font-weight:600; color:#CDB096;">O maior</div>
+    <div class="po" style="left:45px; top:150px; width:340px; height:340px; background:radial-gradient(circle, rgba(140,79,43,.6), rgba(61,35,20,.45));"></div>
+    <div class="serif" style="position:absolute; left:0; width:430px; top:520px; text-align:center; font-size:60px; color:#9C7A5C;">10%</div></div>
+  <div class="card" id="m26b" style="left:560px; top:520px; width:430px; height:640px;">
+    <div style="position:absolute; left:0; width:430px; top:50px; text-align:center; font-size:34px; font-weight:600; color:#F5E8DA;">O mais parecido</div>
+    <div class="po" style="left:140px; top:245px; width:150px; height:150px; background:radial-gradient(circle, #F2A65A, #D97724); box-shadow:0 0 70px rgba(217,119,36,.7);"></div>
+    <div class="serif" style="position:absolute; left:0; width:430px; top:520px; text-align:center; font-size:60px; color:var(--coral);">1%</div></div>
+  <div class="badge no" id="m26x" style="left:262px; top:1190px; width:96px; height:96px;"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></div>
+  <div class="badge ok" id="m26ok" style="left:727px; top:1190px; width:96px; height:96px;"><svg viewBox="0 0 24 24"><use href="#i-ok"/></svg></div>
+  <div class="serif ctr" id="m26t" style="top:1330px; font-size:88px; opacity:0;">parecido com quem <span style="color:var(--coral)">te paga</span></div>
+</div></div>
+
+<!-- M27 92.3–95.53 · clica no link na bio e conheça o Conversão Extrema -->
+<div class="sc marrom" id="m27"><div class="cam">
+  <div class="card" id="m27c" style="left:110px; top:500px; width:860px; height:640px;">
+    <div style="position:absolute; left:60px; top:60px; width:170px; height:170px; border-radius:50%; background:linear-gradient(160deg,#8C4F2B,#3D2314); box-shadow:0 0 0 5px #D97724; display:flex; align-items:center; justify-content:center; font-size:64px; font-weight:700; color:#F6EADC;">SN</div>
+    <div style="position:absolute; left:270px; top:90px; font-size:42px; font-weight:700; display:flex; align-items:center; gap:12px;">seuperfil<img src="assets/verificado.svg" style="width:38px; height:38px;"></div>
+    <div style="position:absolute; left:270px; top:150px; font-size:30px; color:#CDB096;">Seu Nome</div>
+    <div style="position:absolute; left:60px; top:300px; font-size:30px; color:#EBD9C6;">12,4 mil seguidores</div>
+    <div id="m27link" style="position:absolute; left:60px; top:380px; width:740px; height:110px; border-radius:24px; display:flex; align-items:center; gap:18px; padding:0 28px; background:rgba(217,119,36,.1); border:2px solid rgba(217,119,36,.35); font-size:32px; font-weight:600; color:#F2A65A;">
+      <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#F2A65A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-link"/></svg>seulink.com.br</div>
+  </div>
+  <div class="chip" id="m27k" style="left:330px; top:400px;">LINK NA BIO</div>
+  <div class="k ctr" id="m27k2" style="top:1220px; opacity:0;">Conheça o</div>
+  <div class="serif ctr" id="m27t" style="top:1270px; font-size:110px; opacity:0;">Conversão <span style="color:var(--coral)">Extrema</span></div>
+  <svg class="cur" id="m27m" viewBox="0 0 24 24" style="left:760px; top:1240px;"><path d="M4 2 L4 19 L8.5 14.8 L11.6 21.4 L14.2 20.2 L11.1 13.7 L17 13.5 Z" fill="#fff" stroke="#111" stroke-width="1.3" stroke-linejoin="round"/></svg>
+</div></div>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-bot" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4"/><circle cx="12" cy="3.2" r="1"/><circle cx="9" cy="14" r="1.1"/><circle cx="15" cy="14" r="1.1"/><path d="M2 13v3M22 13v3"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.8 2.9-6 6.5-6s6.5 2.2 6.5 6"/><circle cx="17" cy="9" r="2.8"/><path d="M16 14.2c3.2.2 5.5 2.2 5.5 5.3"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/></symbol>
+  <symbol id="i-click" viewBox="0 0 24 24"><path d="M9 9l11 4-5 1.5L13.5 20z"/><path d="M5 3.5l1.5 2M3 8h2.5M9.5 2.5V5"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8h14l-1 13H6z"/><path d="M9 10V6.5a3 3 0 0 1 6 0V10"/></symbol>
+  <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8v-13"/><path d="M4.5 12c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 2.5h8l4 4v15H6z"/><path d="M14 2.5v4h4"/><path d="M9 12.5h6M9 16h6"/></symbol>
+  <symbol id="i-table" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M3.5 14.5h17M9.5 9.5v10"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 20V9M7 13.5l5-5 5 5M5 4h14"/></symbol>
+  <symbol id="i-insta" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.8"/><circle cx="16.8" cy="7.2" r=".8"/></symbol>
+  <symbol id="i-fb" viewBox="0 0 24 24"><path d="M14.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.5-1.5h1.6V4.4c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2.3H9v3h2.5V21"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><circle cx="8.5" cy="8" r="3.2"/><path d="M3 19c0-3.3 2.4-5.4 5.5-5.4S14 15.7 14 19"/><circle cx="16.5" cy="8" r="3.2" stroke-dasharray="2 1.6"/><path d="M15.5 13.7c3 .1 5.5 2.1 5.5 5.3" stroke-dasharray="2 1.6"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z"/></symbol>
+  <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M17 3l3 3-3 3"/><path d="M4 11V9a3 3 0 0 1 3-3h13"/><path d="M7 21l-3-3 3-3"/><path d="M20 13v2a3 3 0 0 1-3 3H4"/></symbol>
+  <symbol id="i-money" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.8"/><path d="M6 9.5v5M18 9.5v5"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3.5 12.5V4h8.5l8.5 8.5-8.5 8.5z"/><circle cx="8" cy="8.5" r="1.4"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"/></symbol>
+</svg>
+
+<script>
+const R = (s) => document.querySelector(s);
+const tl = gsap.timeline({ paused: true });
+const svg = (id, extra = '') => `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ${extra}><use href="#${id}"/></svg>`;
+const sqHTML = (id, x, y, s = 200, lisa = false) => `<div class="sq${lisa ? ' lisa' : ''}" style="left:${x}px; top:${y}px; width:${s}px; height:${s}px; border-radius:${s * .26}px;"><div class="in">${svg(id)}</div></div>`;
+let sem = 7; const rnd = () => (sem = (sem * 16807) % 2147483647) / 2147483647;
+// poeira parada nos fundos escuros (semente fixa)
+document.querySelectorAll('.sc.preto, .sc.marrom, .sc.azul').forEach((sc) => {
+  for (let i = 0; i < 90; i++) { const d = document.createElement('div'); const z = 2 + rnd() * 3.5;
+    const cor = ['#D97724', '#8C4F2B', '#F2A65A', '#5A3520'][Math.floor(rnd() * 4)];
+    d.className = 'po'; d.style.cssText = `left:${rnd() * 1080}px; top:${rnd() * 1920}px; width:${z}px; height:${z}px; background:${cor}; opacity:${.25 + rnd() * .5};`;
+    sc.insertBefore(d, sc.firstChild); }
+});
+// DV[id] = [escala, deslocamento y]: cena da tela dividida — o conteúdo é reduzido e centrado em y 600 (metade de cima, abaixo da faixa do Instagram)
+const DV = { '#m1': [0.968, -247], '#m2': [0.997, -202], '#m3': [0.612, 10], '#m4': [0.724, -106], '#m5': [0.793, -114], '#m11': [0.604, 47], '#m12': [0.606, 93], '#m16': [0.562, 57], '#m17': [0.89, -169], '#m19': [0.549, 93], '#m21': [0.715, 11], '#m23': [0.667, 17], '#m24': [0.537, 75], '#m26': [0.63, -23] };
+Object.keys(DV).forEach((id) => R(id).classList.add('dv'));
+const mostra = (id, a, b) => { tl.set(id, { display: "block", opacity: 1 }, a); tl.set(id, { opacity: 0, display: "none" }, b);
+  const [s, y] = DV[id] || [1, 0];
+  if (DV[id]) tl.fromTo(id + ' > .cam', { scale: s, y, transformOrigin: '50% 0' }, { scale: s * 1.045, y: y - 600 * .045 * 0, duration: b - a, ease: 'none' }, a);
+  else tl.fromTo(id + ' > .cam', { scale: 1 }, { scale: 1.045, duration: b - a, ease: 'none' }, a); };
+const pop = (s, t, d = .5) => tl.fromTo(s, { opacity: 0, scale: .72, y: 18 }, { opacity: 1, scale: 1, y: 0, duration: d, ease: 'back.out(1.9)' }, t);
+const entra = (s, t, y = 26, d = .55) => tl.fromTo(s, { opacity: 0, y, filter: 'blur(10px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: d, ease: 'power3.out' }, t);
+const linha = (s, t, d = .45) => tl.to(s, { scaleX: 1, duration: d, ease: 'power2.inOut' }, t);
+const digita = (s, txt, t0, t1) => { const el = R(s); el.innerHTML = [...txt].map((c) => `<span class="c">${c}</span>`).join('');
+  const cs = el.querySelectorAll('.c'); cs.forEach((c, i) => tl.set(c, { display: 'inline' }, t0 + (t1 - t0) * i / cs.length)); };
+const conta = (s, de, ate, t, d, fmt = (v) => Math.round(v)) => { const o = { v: de }; tl.to(o, { v: ate, duration: d, ease: 'power2.out', onUpdate: () => { R(s).textContent = fmt(o.v); } }, t); };
+const ON = '0 30px 60px rgba(0,0,0,.55), 0 0 0 3px rgba(217,119,36,.9), 0 0 60px rgba(217,119,36,.45)';
+const OFF = '0 30px 60px rgba(0,0,0,.55), 0 0 0 0 rgba(217,119,36,0), 0 0 0 rgba(217,119,36,0)';
+const clique = (cur, t) => { tl.to(cur, { scale: .82, duration: .08, yoyo: true, repeat: 1 }, t); };
+const passo = (n, a, b) => { const p = '#m' + n; mostra(p, a, b);
+  entra(p + 't', a + .08, 30, .6); entra(p + 'k', a + .35, 16, .45); pop(p + 'a', a + .55); linha(p + 'l', a + .8, .35); pop(p + 'b', a + 1.0);
+  tl.to(p + 'b', { boxShadow: ON, duration: .4 }, a + 1.3); };
+const AVC = ['#8C4F2B', '#6B3E22', '#A86A3A', '#5A3520', '#7A4A2A'];
+const avatar = (x, y, s, cor) => `<div class="po pes" style="left:${x}px; top:${y}px; width:${s}px; height:${s}px; background:${cor}; display:flex; align-items:center; justify-content:center; opacity:0; box-shadow:0 10px 24px rgba(0,0,0,.4);">${svg('i-user', `style="width:58%; height:58%; stroke:rgba(255,255,255,.85)"`)}</div>`;
+
+// ---------- M1 0–1.8 · público na Meta
+mostra('#m1', 0, 1.8);
+pop('#m1q', 0.0, .55); entra('#m1t', 0.12, 30, .55); entra('#m1k', 0.86, 14, .4);
+tl.to('#m1q', { boxShadow: ON, duration: .35 }, 1.42);
+
+// ---------- M2 1.8–4.5 · curtiu, comentou, clicou
+mostra('#m2', 1.8, 4.5);
+entra('#m2k', 1.84, 14, .4);
+const G2 = [['i-heart', 'Curtiu', 2.40], ['i-chat', 'Comentou', 3.20], ['i-click', 'Clicou', 4.00]];
+G2.forEach(([ic, nome, t], i) => { const x = 100 + i * 320;
+  R('#c2').insertAdjacentHTML('beforeend', sqHTML(ic, x, 680, 240) + `<div class="lab" style="left:${x - 40}px; top:960px;">${nome}</div>`);
+  const sq = R('#c2').querySelectorAll('.sq')[i], lb = R('#c2').querySelectorAll('.lab')[i];
+  pop(sq, t - .08); entra(lb, t, 14, .4);
+  tl.to(sq, { boxShadow: ON, duration: .25 }, t); if (i < 2) tl.to(sq, { boxShadow: OFF, duration: .3 }, G2[i + 1][2]);
+});
+
+// ---------- M3 6.3–8.5 · pessoas parecidas com os curiosos
+mostra('#m3', 6.3, 8.5);
+entra('#m3k', 6.34, 14, .4);
+for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) { const i = r * 4 + c;
+  R('#c3').insertAdjacentHTML('beforeend', avatar(150 + c * 200, 560 + r * 170, 140, AVC[i % 5])); }
+R('#c3').querySelectorAll('.pes').forEach((p, i) => pop(p, 6.4 + i * .045, .4));
+// os "curiosos": viram interrogação cinza
+R('#c3').querySelectorAll('.pes').forEach((p, i) => tl.to(p, { filter: 'grayscale(1) brightness(.75)', duration: .3 }, 7.7 + (i % 4) * .03));
+entra('#m3t', 7.84, 26, .45);
+
+// ---------- M4 8.5–10.2 · clique não paga a conta
+mostra('#m4', 8.5, 10.2);
+pop('#m4c', 8.52, .5); conta('#m4n', 0, 1240, 8.6, .9, (v) => Math.round(v).toLocaleString('pt-BR'));
+tl.fromTo('#m4m', { opacity: 0 }, { opacity: 1, duration: .12 }, 8.55); tl.to('#m4m', { x: -150, y: -460, duration: .4, ease: 'power2.inOut' }, 8.56); clique('#m4m', 8.6);
+tl.to('#m4m', { opacity: 0, duration: .15 }, 9.1);
+pop('#m4x', 9.28, .4); entra('#m4t', 9.7, 20, .4);
+
+// ---------- M5 12.0–14.3 · nascer de quem comprou
+mostra('#m5', 12.0, 14.3);
+pop('#m5q', 12.02, .55); entra('#m5k', 12.36, 14, .4); entra('#m5t', 13.5, 30, .5);
+tl.to('#m5q', { boxShadow: ON, duration: .35 }, 13.7);
+
+// ---------- M6 14.3–16.0 · Passo 1
+passo(6, 14.3, 16.0);
+
+// ---------- M7 17.4–20.4 · exporta do CRM
+mostra('#m7', 17.4, 20.4);
+pop('#m7k', 17.42, .4); entra('#m7j', 17.42, 40, .5);
+const CLI = [['AS', 'Ana Souza', '3 compras'], ['CL', 'Carlos Lima', '5 compras'], ['JR', 'Juliana Reis', '2 compras'], ['MD', 'Marcos Dias', '4 compras'], ['PM', 'Paula Melo', '6 compras'], ['RF', 'Rafael Freitas', '1 compra'], ['BS', 'Bruna Santos', '3 compras']];
+CLI.forEach(([ini, nome, q], i) => { R('#m7r').insertAdjacentHTML('beforeend', `<div class="row" style="height:104px;"><div class="av" style="background:${AVC[i % 5]}">${ini}</div>
+  <div style="font-size:32px; font-weight:600; flex:1;">${nome}</div><div style="font-size:26px; color:#C4A486;">${q}</div></div>`);
+  entra(R('#m7r').querySelectorAll('.row')[i], 17.6 + i * .09, 14, .35); });
+tl.to(R('#m7r').querySelectorAll('.row'), { borderColor: 'rgba(217,119,36,.55)', backgroundColor: 'rgba(217,119,36,.08)', duration: .25, stagger: .05 }, 18.56);
+tl.fromTo('#m7m', { opacity: 0 }, { opacity: 1, duration: .12 }, 18.6); tl.to('#m7m', { x: 260, y: -650, duration: .55, ease: 'power2.inOut' }, 18.65);
+clique('#m7m', 19.28); tl.to('#m7b', { backgroundColor: '#D97724', borderColor: '#D97724', color: '#fff', duration: .15 }, 19.3);
+
+// ---------- M8 20.4–24.2 · planilha
+mostra('#m8', 20.4, 24.2);
+pop('#m8c', 20.42, .5);
+entra('#m8h1', 20.52, 10, .3); entra('#m8h2', 21.26, 10, .3); entra('#m8h3', 21.78, 10, .3);
+const PL = [['Ana Souza', 'ana.s@email.com', '(48) 9••••-2210'], ['Carlos Lima', 'carlos@email.com', '(11) 9••••-7731'], ['Juliana Reis', 'ju.reis@email.com', '(21) 9••••-4408'],
+  ['Marcos Dias', 'marcos.d@email.com', '(31) 9••••-1906'], ['Paula Melo', 'paula@email.com', '(47) 9••••-3352'], ['Rafael Freitas', 'rafa.f@email.com', '(51) 9••••-8814']];
+PL.forEach((r, i) => { R('#m8r').insertAdjacentHTML('beforeend', `<tr class="pl" style="opacity:0">${r.map((c) => `<td>${c}</td>`).join('')}</tr>`);
+  const tr = R('#m8r').querySelectorAll('.pl')[i];
+  tl.set(tr, { opacity: 1 }, 20.6 + i * .1);
+  [0, 1, 2].forEach((k) => tl.fromTo(tr.children[k], { opacity: 0 }, { opacity: 1, duration: .2 }, [20.6, 21.3, 21.82][k] + i * .1)); });
+pop('#m8s', 23.3, .4); pop('#m8ok', 23.52, .4);
+
+// ---------- M9 24.2–26.7 · Passo 2
+passo(9, 24.2, 26.7);
+
+// ---------- M10 26.7–31.0 · Criar público > personalizado > lista de clientes
+mostra('#m10', 26.7, 31.0);
+entra('#m10j', 26.7, 40, .45);
+tl.fromTo('#m10m', { opacity: 0 }, { opacity: 1, duration: .12 }, 26.72); tl.to('#m10m', { x: 250, y: -760, duration: .45, ease: 'power2.inOut' }, 26.74);
+clique('#m10m', 27.04); tl.to('#m10b', { scale: .95, duration: .08, yoyo: true, repeat: 1 }, 27.04);
+tl.fromTo('#m10menu', { opacity: 0, y: -14 }, { opacity: 1, y: 0, duration: .25, ease: 'power2.out' }, 27.2);
+tl.to('#m10m', { x: 120, y: -670, duration: .45, ease: 'power2.inOut' }, 27.45);
+tl.to('#m10o1', { borderColor: '#D97724', backgroundColor: 'rgba(217,119,36,.14)', duration: .2 }, 27.9); clique('#m10m', 28.04);
+tl.to('#m10menu', { opacity: 0, duration: .2 }, 28.35);
+const SRC = [['i-file', 'Arquivo de clientes'], ['i-table', 'Lista de clientes'], ['i-click', 'Site'], ['i-insta', 'Conta do Instagram']];
+SRC.forEach(([ic, nome], i) => { R('#m10src').insertAdjacentHTML('beforeend', `<div class="row src" style="height:130px; margin-bottom:16px; background:#2A1B11;">
+  <div style="width:84px; height:84px; border-radius:22px; background:#3D2716; display:flex; align-items:center; justify-content:center;">${svg(ic, 'style="width:48px; height:48px; stroke:#F2A65A"')}</div>
+  <div style="font-size:34px; font-weight:600;">${nome}</div></div>`); });
+// "Arquivo de clientes" não existe com esse nome: a origem real é "Lista de clientes" — deixa só 3 opções reais
+R('#m10src').querySelectorAll('.src')[0].remove();
+tl.set('#m10src', { opacity: 1 }, 28.4);
+R('#m10src').querySelectorAll('.src').forEach((s, i) => entra(s, 28.45 + i * .1, 16, .35));
+tl.to('#m10m', { x: 40, y: -620, duration: .55, ease: 'power2.inOut' }, 29.1);
+tl.to(R('#m10src').querySelectorAll('.src')[0], { borderColor: '#D97724', backgroundColor: 'rgba(217,119,36,.14)', duration: .2 }, 29.7); clique('#m10m', 29.82);
+tl.to(R('#m10src').querySelectorAll('.src')[0], { scale: 1.04, duration: .35, ease: 'back.out(2)' }, 29.82);
+
+// ---------- M11 31.0–33.6 · sobe a planilha
+mostra('#m11', 31.0, 33.6);
+pop('#m11f', 31.02, .45); pop('#m11q', 31.1, .5); tl.to('#m11bg', { opacity: 1, duration: .3 }, 31.1);
+tl.to('#m11f', { y: 420, scale: .3, opacity: 0, duration: .55, ease: 'power2.in' }, 31.56);
+tl.to('#m11arc', { strokeDashoffset: 0, duration: 1.4, ease: 'power2.inOut' }, 31.7); entra('#m11n', 31.7, 16, .35); conta('#m11v', 0, 100, 31.7, 1.4);
+entra('#m11k', 31.8, 12, .35);
+tl.to('#m11q', { boxShadow: ON, duration: .3 }, 33.1);
+
+// ---------- M12 35.4–39.7 · cruza os dados
+mostra('#m12', 35.4, 39.7);
+entra('#m12k', 35.42, 14, .4); pop('#m12c', 35.42, .45);
+[['Ana Souza', 'ana.s@email.com'], ['Carlos Lima', 'carlos@email.com'], ['Juliana Reis', 'ju.reis@email.com']].forEach(([n, e], i) => {
+  R('#m12c').insertAdjacentHTML('beforeend', `<div class="cz" style="display:flex; justify-content:space-between; height:90px; align-items:center; font-size:30px; border-bottom:1.5px solid rgba(255,255,255,.08);"><span style="font-weight:600;">${n}</span><span style="color:#CDB096;">${e}</span></div>`); });
+linha('#m12l1', 35.76, .5); linha('#m12l2', 35.8, .5);
+pop('#m12a', 36.84, .45); entra('#m12al', 37.0, 12, .35); tl.to('#m12a', { boxShadow: ON, duration: .3 }, 37.38);
+pop('#m12b', 39.1, .45); entra('#m12bl', 39.2, 12, .35); tl.to('#m12b', { boxShadow: ON, duration: .3 }, 39.3);
+R('#m12c').querySelectorAll('.cz').forEach((c, i) => tl.to(c, { color: '#F2A65A', duration: .2 }, 37.4 + i * .15));
+
+// ---------- M13 41.0–42.8 · Passo 3
+passo(13, 41.0, 42.8);
+
+// ---------- M14 42.8–45.3 · criar público semelhante
+mostra('#m14', 42.8, 45.3);
+entra('#m14j', 42.8, 40, .45);
+tl.to('#m14row', { borderColor: 'rgba(217,119,36,.9)', duration: .25 }, 42.85);
+tl.fromTo('#m14m', { opacity: 0 }, { opacity: 1, duration: .12 }, 42.9); tl.to('#m14m', { x: -180, y: -480, duration: .45, ease: 'power2.inOut' }, 42.92);
+clique('#m14m', 43.42); tl.to('#m14b', { backgroundColor: '#D97724', borderColor: '#D97724', color: '#fff', scale: .97, duration: .12 }, 43.44); tl.to('#m14b', { scale: 1, duration: .2 }, 43.6);
+entra('#m14ok', 44.28, 14, .35);
+
+// ---------- M15 45.3–47.9 · Brasil, 1%
+mostra('#m15', 45.3, 47.9);
+pop('#m15c', 45.32, .5); digita('#m15b', 'Brasil', 45.7, 46.15);
+tl.fromTo('#m15knob', { x: 600 }, { x: 0, duration: .6, ease: 'power3.inOut' }, 46.5);
+tl.fromTo('#m15fill', { width: 600 }, { width: 22, duration: .6, ease: 'power3.inOut' }, 46.5);
+entra('#m15n', 47.18, 20, .4);
+
+// ---------- M16 47.9–49.7 · grupo mais parecido
+mostra('#m16', 47.9, 49.7);
+pop('#m16r3', 47.92, .45); pop('#m16r2', 48.0, .45); pop('#m16r1', 48.08, .45);
+entra('#m16k', 48.36, 12, .35); entra('#m16t', 48.74, 20, .4);
+tl.to('#m16r1', { scale: 1.08, duration: .3, yoyo: true, repeat: 1 }, 49.22);
+
+// ---------- M17 51.2–53.7 · Advantage+
+mostra('#m17', 51.2, 53.7);
+entra('#m17k', 51.32, 14, .4); pop('#m17c', 52.1, .5); pop('#m17ia', 53.0, .4);
+
+// ---------- M18 53.7–57.1 · semelhante como sugestão
+mostra('#m18', 53.7, 57.1);
+entra('#m18j', 53.7, 40, .45); pop('#m18chip', 53.86, .45);
+tl.fromTo('#m18m', { opacity: 0 }, { opacity: 1, duration: .12 }, 54.0);
+tl.to('#m18chip', { y: -690, scale: .98, duration: .9, ease: 'power2.inOut' }, 54.5); tl.to('#m18m', { y: -690, duration: .9, ease: 'power2.inOut' }, 54.5);
+tl.to('#m18slot', { borderColor: 'rgba(217,119,36,.9)', duration: .3 }, 55.2);
+clique('#m18m', 55.44); tl.to('#m18m', { opacity: 0, duration: .15 }, 55.8);
+pop('#m18ok', 55.7, .4);
+
+// ---------- M19 58.8–61.7 · IA procura parecidos
+mostra('#m19', 58.8, 61.7);
+pop('#m19q', 58.82, .5);
+const PAREC = new Set([2, 7, 9, 14, 18, 22]);
+for (let r = 0; r < 4; r++) for (let c = 0; c < 6; c++) { R('#c19').insertAdjacentHTML('beforeend', avatar(105 + c * 148, 770 + r * 150, 118, AVC[(r * 6 + c) % 5])); }
+R('#c19').querySelectorAll('.pes').forEach((p, i) => pop(p, 58.9 + i * .025, .35));
+tl.fromTo('#m19scan', { opacity: 0 }, { opacity: 1, duration: .1 }, 59.3); tl.to('#m19scan', { y: 600, duration: 1.0, ease: 'none' }, 59.3); tl.to('#m19scan', { opacity: 0, duration: .15 }, 60.3);
+R('#c19').querySelectorAll('.pes').forEach((p, i) => { const t = 59.4 + Math.floor(i / 6) * .25;
+  if (PAREC.has(i)) tl.to(p, { backgroundColor: '#D97724', boxShadow: '0 0 0 4px rgba(242,166,90,.9), 0 0 40px rgba(217,119,36,.6)', scale: 1.1, duration: .25 }, t);
+  else tl.to(p, { opacity: .3, duration: .3 }, t + .1); });
+entra('#m19k', 60.22, 14, .4);
+
+// ---------- M20 63.1–65.4 · não sobe todo mundo
+mostra('#m20', 63.1, 65.4);
+pop('#m20c', 63.12, .45);
+CLI.concat([['LT', 'Lucas Teixeira', '1 compra']]).forEach(([ini, nome, q], i) => { R('#m20r').insertAdjacentHTML('beforeend', `<div class="row" style="height:92px;"><div class="av" style="background:${AVC[i % 5]}">${ini}</div>
+  <div style="font-size:32px; font-weight:600; flex:1;">${nome}</div><div style="font-size:26px; color:#9C7A5C;">${q}</div></div>`);
+  entra(R('#m20r').querySelectorAll('.row')[i], 63.2 + i * .06, 12, .3); });
+pop('#m20x', 63.88, .4); tl.to('#m20c', { filter: 'grayscale(1)', opacity: .7, duration: .3 }, 64.0); entra('#m20t', 64.18, 20, .4);
+
+// ---------- M21 65.4–67.6 · só os melhores
+mostra('#m21', 65.4, 67.6);
+entra('#m21k', 65.52, 14, .4); entra('#m21t', 66.3, 26, .45);
+[['CL', 'Carlos Lima', '5 compras'], ['PM', 'Paula Melo', '6 compras'], ['MD', 'Marcos Dias', '4 compras']].forEach(([ini, nome, q], i) => {
+  R('#m21r').insertAdjacentHTML('beforeend', `<div class="card mel" style="position:relative; height:150px; margin-bottom:30px; display:flex; align-items:center; gap:26px; padding:0 34px;">
+    <div class="av" style="width:84px; height:84px; font-size:32px; background:${AVC[i]}">${ini}</div><div style="flex:1;"><div style="font-size:38px; font-weight:700;">${nome}</div><div style="font-size:28px; color:#CDB096; margin-top:4px;">${q}</div></div>
+    ${svg('i-star', 'style="width:56px; height:56px; stroke:#F2A65A; fill:rgba(217,119,36,.35)"')}</div>`);
+  const c = R('#m21r').querySelectorAll('.mel')[i]; pop(c, 65.6 + i * .12, .45);
+  tl.to(c, { borderColor: 'rgba(217,119,36,.95)', boxShadow: '0 40px 80px rgba(0,0,0,.55), 0 0 50px rgba(217,119,36,.35)', duration: .3 }, 66.84 + i * .08); });
+
+// ---------- M22 67.6–72.2 · mais vezes, pagaram mais, sem desconto
+mostra('#m22', 67.6, 72.2);
+entra('#m22k', 67.62, 14, .4);
+[['i-repeat', 'Compraram mais vezes', 67.86], ['i-money', 'Pagaram mais', 69.64], ['i-tag', 'Não pediram desconto', 71.28]].forEach(([ic, txt, t], i) => { const y = 530 + i * 270;
+  R('#c22').insertAdjacentHTML('beforeend', `<div class="card it" style="left:90px; top:${y}px; width:900px; height:220px;">
+    <div style="position:absolute; left:34px; top:40px; width:140px; height:140px; border-radius:38px; background:linear-gradient(160deg,#EE9A4A,#D97724); display:flex; align-items:center; justify-content:center; box-shadow:0 10px 26px rgba(217,119,36,.45);">${svg(ic, 'style="width:78px; height:78px; stroke:#fff"')}</div>
+    <div style="position:absolute; left:210px; top:78px; font-size:44px; font-weight:600;">${txt}</div>
+    <div class="badge ok tk" style="left:800px; top:74px;">${svg('i-ok')}</div></div>`);
+  const c = R('#c22').querySelectorAll('.it')[i]; entra(c, t - .1, 30, .5); pop(c.querySelector('.tk'), t + .45, .35);
+  tl.to(c, { borderColor: 'rgba(217,119,36,.95)', duration: .25 }, t); if (i < 2) tl.to(c, { borderColor: 'rgba(255,255,255,.14)', duration: .3 }, [69.64, 71.28][i]);
+});
+
+// ---------- M23 72.2–75.3 · 100 pessoas
+mostra('#m23', 72.2, 75.3);
+entra('#m23k', 72.36, 14, .4); entra('#m23n', 72.4, 30, .5); conta('#m23v', 0, 100, 72.5, 1.4); entra('#m23l', 74.22, 14, .4);
+for (let i = 0; i < 100; i++) { const d = document.createElement('div'); d.className = 'po d1';
+  d.style.cssText = `left:${(i % 10) * 65 + 12}px; top:${Math.floor(i / 10) * 65 + 12}px; width:40px; height:40px; background:#D97724; opacity:0; box-shadow:0 4px 10px rgba(217,119,36,.35);`;
+  R('#m23g').appendChild(d); tl.to(d, { opacity: 1, duration: .08 }, 72.5 + 1.4 * (1 - Math.pow(1 - i / 100, 2))); }
+
+// ---------- M24 77.5–80.1 · qualquer cliente
+mostra('#m24', 77.5, 80.1);
+for (let i = 0; i < 18; i++) { const x = 90 + (i % 6) * 155 + (Math.floor(i / 6) % 2) * 50, y = 420 + Math.floor(i / 6) * 230 + rnd() * 40;
+  R('#c24').insertAdjacentHTML('beforeend', avatar(x, y, 120, AVC[i % 5])); }
+R('#c24').querySelectorAll('.pes').forEach((p, i) => { pop(p, 77.55 + i * .03, .35); tl.to(p, { filter: 'grayscale(1) brightness(.6)', duration: .3 }, 78.06); });
+pop('#m24x', 78.06, .4); entra('#m24t', 78.88, 20, .4);
+
+// ---------- M25 80.1–83.6 · parecidos com seu melhor cliente
+mostra('#m25', 80.1, 83.6);
+pop('#m25q', 80.18, .55); tl.to('#m25q', { boxShadow: ON, duration: .35 }, 80.5);
+for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2 - Math.PI / 2, rr = 360; const cx = 540 + Math.cos(a) * rr - 60, cy = 860 + Math.sin(a) * rr - 60;
+  const w = document.createElement('div'); w.style.cssText = `position:absolute; left:${540 + Math.cos(a) * 140}px; top:${860 + Math.sin(a) * 140}px; transform:rotate(${a * 180 / Math.PI}deg); transform-origin:0 0;`;
+  const l = document.createElement('div'); l.className = 'linha'; l.style.cssText = `left:0; top:0; width:${rr - 210}px;`; w.appendChild(l);
+  R('#c25').insertBefore(w, R('#m25q')); linha(l, 81.12 + i * .05, .35);
+  R('#c25').insertAdjacentHTML('beforeend', avatar(cx, cy, 120, AVC[i % 5]));
+  const p = R('#c25').querySelectorAll('.pes')[i]; pop(p, 81.2 + i * .06, .4);
+  tl.to(p, { backgroundColor: '#B8611B', boxShadow: '0 0 0 3px rgba(242,166,90,.8), 0 0 30px rgba(217,119,36,.45)', duration: .3 }, 81.9 + i * .04); }
+entra('#m25k', 81.74, 14, .4); entra('#m25t', 82.32, 20, .4);
+
+// ---------- M26 85.7–88.6 · o maior × o mais parecido
+mostra('#m26', 85.7, 88.6);
+pop('#m26a', 85.72, .45); pop('#m26b', 85.9, .45);
+pop('#m26x', 86.16, .4); tl.to('#m26a', { opacity: .45, filter: 'grayscale(1)', duration: .3 }, 86.2);
+tl.to('#m26b', { borderColor: 'rgba(217,119,36,.95)', boxShadow: '0 40px 80px rgba(0,0,0,.55), 0 0 50px rgba(217,119,36,.35)', scale: 1.04, duration: .35, ease: 'back.out(2)' }, 86.74);
+pop('#m26ok', 86.74, .4); entra('#m26t', 87.42, 20, .4);
+
+// ---------- M27 92.3–95.53 · link na bio
+mostra('#m27', 92.3, 95.53);
+pop('#m27c', 92.32, .5); pop('#m27k', 92.6, .4);
+tl.fromTo('#m27m', { opacity: 0 }, { opacity: 1, duration: .12 }, 92.4); tl.to('#m27m', { x: -260, y: -290, duration: .45, ease: 'power2.inOut' }, 92.42);
+tl.to('#m27link', { borderColor: '#D97724', backgroundColor: 'rgba(217,119,36,.22)', duration: .2 }, 92.76); clique('#m27m', 92.9);
+tl.to('#m27link', { scale: 1.05, duration: .3, ease: 'back.out(2)' }, 92.9);
+tl.to('#m27m', { opacity: 0, duration: .15 }, 93.6);
+entra('#m27k2', 93.6, 14, .4); entra('#m27t', 94.28, 24, .45);
+
+tl.set({}, {}, 95.53);
+window.__timelines = window.__timelines || {};
+window.__timelines['main'] = tl;
+tl.seek(0);
+</script>
+</body></html>

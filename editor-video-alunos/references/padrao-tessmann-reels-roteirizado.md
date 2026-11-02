@@ -71,7 +71,8 @@ O fundo da dividida é **#070707** — a mesma cor do fim do degradê (cor difer
 
 ## 4. Transições e som
 
-- **Queima de filme (film burn) em todo corte de cena**: overlay em **modo tela (screen)**, o pico de luz alinhado no
+- **Queima de filme (film burn) só quando muda o tipo de tela** — cheia → dividida, dividida → cheia, entrada e saída de
+  tela de app em tela cheia. Dividida → dividida e tela → tela são corte seco (queima em todo corte fica carregado). Overlay em **modo tela (screen)**, o pico de luz alinhado no
   corte, uma queima diferente a cada corte, ~88 % de intensidade. Overlay deitado (16:9) é **girado 90°** para caber
   inteiro no vertical — recortar o meio vira só um clarão branco. Aplicar depois do render com
   `work/queima_cortes.py` (o overlay é do aluno; sem overlay, corte seco).
@@ -119,7 +120,7 @@ juntar as tomadas, cortar as pausas longas e **transcrever o áudio já cortado*
 - [ ] Legenda: uma palavra por vez, nada solto, nada sobreposto, nada abaixo de 1300, preta nas telas claras.
 - [ ] Caixa vermelha só em detalhe pequeno.
 - [ ] Cortes na grade de 1/30 s e nenhum trecho travado no MP4 final.
-- [ ] Queima de filme alinhada nos cortes.
+- [ ] Queima de filme só nas trocas de tipo de tela, alinhada no corte.
 - [ ] Sem música; voz a −15 LUFS.
 - [ ] CTA inteiro até a última palavra.
 - [ ] Dados inventados das telas recriadas avisados ao aluno; `fontes.md` com o material real usado.

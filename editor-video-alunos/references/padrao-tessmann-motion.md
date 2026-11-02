@@ -86,7 +86,6 @@ com 2–3 palavras destacadas na cor da marca, entrando palavra por palavra. Nã
 
 ## 6. Dentro do YouTube
 
-No YouTube, a **linguagem** deste padrão (não o conteúdo) é o estilo das telas cheias e das animações ao lado da
-pessoa: quando ela explica um recurso, um fluxo, um número ou uma comparação, em vez de print parado ou cartão de
-texto, entra motion assim — adaptado a 1920x1080, sincronizado à fala dela, sem voz nem trilha próprias (só os
-efeitos sonoros). Detalhes em `padrao-tessmann-youtube.md`, seção 0.
+Desde 02/11/2026 o YouTube tem um estilo de motion próprio (coral, serifa, retícula — estilo LABS), descrito em
+`padrao-tessmann-youtube.md`. Este arquivo continua valendo para o vídeo de motion de produto/app (opção 6); no
+YouTube, siga o arquivo do YouTube.

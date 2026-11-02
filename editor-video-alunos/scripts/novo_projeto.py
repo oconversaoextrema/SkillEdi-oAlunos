@@ -37,13 +37,14 @@ ligar(AMB['fontes'], proj / 'ferramentas' / 'fontes')
 for f in (SKILL / 'scripts').glob('*.py'):
     if f.name not in ('instalar.py', 'novo_projeto.py'):
         shutil.copy2(f, proj / 'work' / f.name)
-for m in ['remotion-modelo', 'hyperframes-modelo']:
+for m in ['remotion-modelo', 'hyperframes-modelo', 'hyperframes-labs', 'hyperframes-labs-reels']:
     d = proj / 'work' / 'modelos' / m
     if not d.exists():
         shutil.copytree(SKILL / 'assets' / m, d)
 gsap = Path(AMB['pasta']) / 'hyperframes' / 'node_modules' / 'gsap' / 'dist' / 'gsap.min.js'
 if gsap.exists():
-    (proj / 'work' / 'modelos' / 'hyperframes-modelo' / 'vendor').mkdir(exist_ok=True)
-    shutil.copy2(gsap, proj / 'work' / 'modelos' / 'hyperframes-modelo' / 'vendor' / 'gsap.min.js')
+    for m in ['hyperframes-modelo', 'hyperframes-labs', 'hyperframes-labs-reels']:
+        (proj / 'work' / 'modelos' / m / 'vendor').mkdir(exist_ok=True)
+        shutil.copy2(gsap, proj / 'work' / 'modelos' / m / 'vendor' / 'gsap.min.js')
 print('projeto pronto:', proj)
 print('python das ferramentas:', AMB['python'])

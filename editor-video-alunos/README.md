@@ -50,7 +50,7 @@ Para só conferir o que está instalado, acrescente `--verificar`.
 | `references/editar-do-zero.md` | as perguntas e o padrão-base quando você descreve a edição |
 | `references/treinar-com-referencia.md` | como medir um vídeo de referência e virar o seu padrão |
 | `references/modelo-padrao-do-aluno.md` | esqueleto do seu padrão (fica salvo no seu projeto) |
-| `references/padrao-tessmann-*.md` | os padrões do Tiago: Reels (tela dividida e roteirizado), criativos, YouTube e motion |
+| `references/padrao-tessmann-*.md` | os padrões do Tiago: Reels (tela dividida, roteirizado e LABS), criativos, YouTube e motion |
 | `references/pipeline-tecnico.md` | o pipeline Python do padrão Tessmann, passo a passo |
 | `scripts/instalar.*` | instalador (Mac/Linux `.sh`, Windows `.ps1`) |
 | `scripts/` | corte de silêncio, transcrição, recorte de pessoa, download, render de Reels/criativo, queima de filme nos cortes |

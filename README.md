@@ -56,7 +56,7 @@ Windows (PowerShell): `powershell -ExecutionPolicy Bypass -File $HOME\.claude\sk
 | `references/editar-do-zero.md` | as perguntas e o padrão-base quando você descreve a edição |
 | `references/treinar-com-referencia.md` | como medir uma referência sua e transformar em padrão |
 | `references/modelo-padrao-do-aluno.md` | esqueleto do seu padrão |
-| `references/padrao-tessmann-*.md` | os padrões do Tiago: Reels (tela dividida e roteirizado), criativos, YouTube e motion |
+| `references/padrao-tessmann-*.md` | os padrões do Tiago: Reels (tela dividida, roteirizado e LABS), criativos, YouTube (LABS) e motion |
 | `references/pipeline-tecnico.md` | o pipeline Python do padrão Tessmann, passo a passo |
 | `scripts/` | instalador, corte de silêncio, transcrição, recorte de pessoa, download, render de Reels/criativo, queima de filme nos cortes |
 | `assets/remotion-modelo/` | projeto Remotion pronto (vídeo + inserts + legenda palavra por palavra) |

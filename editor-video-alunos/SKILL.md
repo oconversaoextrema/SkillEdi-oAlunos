@@ -58,8 +58,9 @@ Se a resposta for **c) Estilo Tiago**, a segunda pergunta é:
 > **1. Criativo (anúncio)** — e aí: tela dividida ou inteira? Quais formatos (até quatro: 1080x1920, 1080x1350, 1080x1080, 1920x1080)?
 > **2. Reels com tela dividida** — material real em cima (notícia, famoso, print, vídeo), você embaixo.
 > **3. Reels roteirizado (tutorial)** — material em cima em largura total, legenda palavra por palavra, telas de app com cursor.
-> **4. YouTube (16:9)** — vídeo longo, você em tela cheia com texto, animações e inserts.
-> **5. Motion** — vídeo animado de produto, app ou serviço (estilo "prévia premium"), com narração.
+> **4. YouTube (16:9)** — vídeo longo no estilo LABS: você em tela cheia limpa intercalado com motion coral (ícones 3D, contadores, telas recriadas), sem legenda.
+> **5. Reels LABS (9:16)** — o estilo LABS no vertical: motion na paleta do cenário, você recortado embaixo com degradê atrás (sem linha de divisão), alternando com tela cheia; sem legenda.
+> **6. Motion** — vídeo animado de produto, app ou serviço (estilo "prévia premium"), com narração.
 
 Se a resposta for **a)** ou **b)**, perguntar também **onde vai postar**: Reels/TikTok/Shorts (1080x1920), feed
 (1080x1350), quadrado (1080x1080) ou YouTube (1920x1080) — pode ser mais de um.
@@ -97,8 +98,9 @@ Cada correção dele vai para `references/padrao-do-aluno.md` — vira o padrão
 | 1. Criativo (anúncio) | `references/padrao-tessmann-criativos.md` | pipeline Python (`references/pipeline-tecnico.md`) |
 | 2. Reels com tela dividida | `references/padrao-tessmann-reels.md` | pipeline Python |
 | 3. Reels roteirizado (tutorial) | `references/padrao-tessmann-reels-roteirizado.md` | HyperFrames (`work/modelos/hyperframes-modelo`) + `work/queima_cortes.py` |
-| 4. YouTube (16:9) | `references/padrao-tessmann-youtube.md` | Remotion (`work/modelos/remotion-modelo`, 1920x1080) + HyperFrames nas animações |
-| 5. Motion | `references/padrao-tessmann-motion.md` | HyperFrames |
+| 4. YouTube (16:9) — estilo LABS (desde 02/11/2026) | `references/padrao-tessmann-youtube.md` | HyperFrames (`work/modelos/hyperframes-labs`) + montagem `work/labs_compor.py` |
+| 5. Reels LABS (9:16) | `references/padrao-tessmann-reels-labs.md` | HyperFrames (`work/modelos/hyperframes-labs-reels`) + `work/recortar_pessoa.py` + montagem `work/labs_reels_compor.py` |
+| 6. Motion | `references/padrao-tessmann-motion.md` | HyperFrames |
 
 São padrões medidos e corrigidos nas edições reais. Em caso de conflito entre eles e qualquer outra coisa escrita
 aqui, vale o arquivo do padrão. Dentro de um arquivo de padrão, a seção marcada **"atualização"** vale por cima do
@@ -116,7 +118,7 @@ resto do arquivo.
 5. **Blocos por unidade de sentido.** Cada bloco fecha uma ideia curta. Nunca separar artigo, preposição ou adjetivo da palavra que acompanham; ponto final e vírgula fecham o bloco; nunca começar frase nova no meio de um bloco. Exemplo BOM/RUIM completo nos arquivos de padrão de Reels e de criativo.
 6. **Revisar a transcrição** antes de renderizar: nome próprio, número, sigla e jargão do nicho a máquina erra. Conferir a sincronia extraindo o quadro no instante exato de algumas palavras.
 7. **Primeiros 10 s sem legenda** no padrão Tessmann — a legenda de abertura é colocada à mão depois. Confirmar com o aluno se ele quer assim.
-7a. **No YouTube não entra legenda no vídeo.** O que aparece sobre a imagem é o texto grande do padrão (frase de impacto, frase âncora, lista, ilustração), com os tamanhos de `references/padrao-tessmann-youtube.md`. A regra 5 vale para escolher o texto desses blocos: frase curta, ideia fechada.
+7a. **No YouTube não entra legenda no vídeo**, nem texto em cima da pessoa. Todo texto é rótulo curto dentro do motion (estilo LABS, `references/padrao-tessmann-youtube.md`). A regra 5 vale para escolher esses rótulos: curtos, ideia fechada.
 
 ### Imagem
 8. **Primeiro quadro forte**: material de verdade, cena de notícia, vídeo da coisa citada. Nunca só um logo parado.
@@ -124,7 +126,7 @@ resto do arquivo.
 10. **Só material real** — TikTok, YouTube, Instagram, print de notícia, gravação de tela, logo oficial. **Nada de banco de imagem** nem b-roll publicitário de estúdio.
 11. **Nada repetido**: cada clipe ou imagem aparece uma vez só no vídeo.
 12. **Enquadramento conferido no quadro real**, não no olho: centrar o recorte no rosto detectado, cabeça e mãos inteiras, e conferir a janela inteira do clipe (a cada 0,5 s) para não pegar transição de estúdio no meio. Descartar clipe com texto queimado, tarja/lower-third, split-screen ou barra preta.
-13. **Sem crédito de fonte na tela** nos verticais — a procedência fica registrada em `referencias/<vídeo>/fontes.md`, com URL, autor, veículo e data. **No YouTube é o contrário**: o insert leva a legenda da fonte em cinza 26 px embaixo à esquerda.
+13. **Sem crédito de fonte na tela** nos verticais — a procedência fica registrada em `referencias/<vídeo>/fontes.md`, com URL, autor, veículo e data. **No YouTube é o contrário**: o print real leva a linha da fonte, legível, embaixo da janela.
 
 ### Material da internet
 14. Buscar bastante e conferir identidade, contexto e data antes de usar. **Nunca inventar imagem e apresentar como real** — se não achar, dizer que não achou e pedir o link ou o arquivo.
@@ -159,7 +161,9 @@ Tudo instalado pelo Passo 0. Qual usar:
 | transcrição e legenda palavra por palavra | Whisper — `work/transcrever.py` |
 | baixar trecho de vídeo da internet (com autorização do aluno) | yt-dlp — `work/baixar.py` |
 | Reels/criativo no padrão Tessmann | pipeline Python — `criativo_prep.py`, `reels2.py`, `criativo.py` (`references/pipeline-tecnico.md`) |
-| montagem completa: tela dividida, inserts, legenda, YouTube 16:9 | Remotion — `work/modelos/remotion-modelo` |
+| montagem completa: tela dividida, inserts, legenda | Remotion — `work/modelos/remotion-modelo` |
+| YouTube 16:9 (estilo LABS): motion + montagem com retícula e transições | HyperFrames `work/modelos/hyperframes-labs` + `work/labs_compor.py` |
+| Reels LABS 9:16: dividida com a pessoa recortada sobre degradê + tela cheia + motion | HyperFrames `work/modelos/hyperframes-labs-reels` + `work/labs_reels_compor.py` |
 | tela de app recriada com cursor, cartões, contadores, lettering animado | HyperFrames — `work/modelos/hyperframes-modelo` |
 | motion de produto/app (estilo prévia premium) | HyperFrames — `references/padrao-tessmann-motion.md` |
 | queima de filme (film burn) em todos os cortes | `work/queima_cortes.py` (overlay do aluno) |

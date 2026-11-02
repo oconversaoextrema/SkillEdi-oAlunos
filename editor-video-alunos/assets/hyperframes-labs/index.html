@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="pt-BR" data-resolution="landscape">
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=1920, height=1080" />
+<!-- MODELO do YouTube estilo LABS (references/padrao-tessmann-youtube.md): exemplo de 1 min com as peças do padrão. Só as cenas de motion;
+     o rosto, as transições (clarão / whip / blur) e o acabamento (retícula, aberração, grão) entram no work/labs_compor.py. -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=block" rel="stylesheet">
+<script src="vendor/gsap.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:1920px; height:1080px; overflow:hidden; background:#000; }
+#root { width:100%; height:100%; position:relative; font-family:Inter, sans-serif; color:#F3EDE9; }
+:root { --coral:#D87259; --coral2:#EE9471; --cv:#DC6658; --ok:#3FBF7F; --no:#E5484D; }
+.sc { position:absolute; inset:0; opacity:0; overflow:hidden; }
+.cam { position:absolute; inset:0; transform-origin:50% 50%; }
+/* fundos medidos na referência */
+.marrom { background:radial-gradient(1200px 800px at 50% 105%, rgba(120,52,32,.38), transparent 70%), radial-gradient(1500px 1000px at 50% 50%, #1C1012 0%, #120A0C 55%, #08070A 100%); }
+.azul { background:radial-gradient(1100px 700px at 75% 100%, rgba(120,60,40,.16), transparent 70%), radial-gradient(1500px 1000px at 50% 45%, #232634 0%, #171923 55%, #0B0B14 100%); }
+.creme { background:radial-gradient(900px 600px at 30% 20%, #FFF8F3, transparent 70%), radial-gradient(1400px 1000px at 60% 60%, #F4EAE4 0%, #EADDD5 70%, #DDCBC1 100%); color:#1E1A1A; }
+.preto { background:radial-gradient(1500px 1000px at 50% 50%, #121214 0%, #0B0B0D 60%, #060608 100%); }
+.po { position:absolute; border-radius:50%; }
+/* squircle 3D */
+.sq { position:absolute; width:200px; height:200px; border-radius:52px; display:flex; align-items:center; justify-content:center; opacity:0;
+  background:linear-gradient(160deg, #3A3236 0%, #241D20 55%, #1A1517 100%);
+  box-shadow:0 30px 60px rgba(0,0,0,.55), 0 8px 18px rgba(0,0,0,.4), inset 0 2px 0 rgba(255,255,255,.12), inset 0 -6px 14px rgba(0,0,0,.35); }
+.azul .sq { background:linear-gradient(160deg, #3D4556 0%, #2A3140 55%, #1F2531 100%); }
+.sq .in { width:58%; height:58%; border-radius:30%; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(160deg, #F09878, #D86A50 60%, #C2563E); box-shadow:0 10px 26px rgba(216,114,89,.45), inset 0 2px 0 rgba(255,255,255,.35); }
+.sq .in svg { width:56%; height:56%; stroke:#fff; }
+.sq.lisa .in { background:none; box-shadow:none; }
+.sq.lisa .in svg { stroke:var(--coral); width:72%; height:72%; }
+.sq.on { box-shadow:0 30px 60px rgba(0,0,0,.55), 0 0 0 3px rgba(216,114,89,.9), 0 0 60px rgba(216,114,89,.45), inset 0 2px 0 rgba(255,255,255,.12); }
+.lab { position:absolute; font-size:34px; font-weight:600; text-align:center; width:320px; opacity:0; color:#EFE7E2; }
+.serif { font-family:Newsreader, Georgia, serif; font-weight:400; letter-spacing:-.01em; }
+.k { font-size:30px; font-weight:600; letter-spacing:.34em; text-transform:uppercase; color:var(--coral); }
+.badge { position:absolute; width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center; opacity:0;
+  box-shadow:0 8px 20px rgba(0,0,0,.4), inset 0 2px 0 rgba(255,255,255,.3); }
+.badge svg { width:58%; height:58%; stroke:#fff; stroke-width:3.2; }
+.badge.no { background:linear-gradient(160deg,#F06A6E,#D63C42); }
+.badge.ok { background:linear-gradient(160deg,#F09878,#D86A50); }
+.card { position:absolute; border-radius:36px; opacity:0;
+  background:linear-gradient(160deg, rgba(86,62,58,.78), rgba(50,36,36,.82)); border:1.5px solid rgba(255,255,255,.14);
+  box-shadow:0 40px 80px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.12); }
+.azul .card { background:linear-gradient(160deg, rgba(66,76,96,.8), rgba(40,46,60,.85)); }
+.card.on { border-color:rgba(216,114,89,.95); box-shadow:0 40px 80px rgba(0,0,0,.55), 0 0 50px rgba(216,114,89,.35), inset 0 1px 0 rgba(255,255,255,.12); }
+.branco { position:absolute; border-radius:40px; background:#FFFFFF; opacity:0; color:#1E1A1A;
+  box-shadow:0 50px 90px rgba(90,50,30,.22), 0 6px 18px rgba(90,50,30,.12); }
+.jan { position:absolute; border-radius:26px; background:#1A1A1C; border:1.5px solid rgba(255,255,255,.12); opacity:0; overflow:hidden;
+  box-shadow:0 60px 120px rgba(0,0,0,.55); color:#E8E4E1; }
+.jan .bar { height:56px; display:flex; align-items:center; gap:10px; padding:0 24px; border-bottom:1px solid rgba(255,255,255,.07); }
+.jan .bar i { width:14px; height:14px; border-radius:50%; display:inline-block; }
+.linha { position:absolute; height:3px; background:linear-gradient(90deg, rgba(216,114,89,.2), var(--coral)); transform-origin:left center; transform:scaleX(0); border-radius:2px; }
+.chip { position:absolute; padding:12px 26px; border-radius:40px; font-size:28px; font-weight:700; letter-spacing:.22em; opacity:0;
+  border:2px solid var(--coral); color:var(--coral); background:rgba(216,114,89,.08); }
+.cur { position:absolute; width:44px; height:44px; opacity:0; z-index:20; }
+.px { position:absolute; width:16px; height:16px; background:#E9DCD6; opacity:0; }
+.c { display:none; }
+</style></head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="70.85" data-width="1920" data-height="1080">
+
+<!-- S1 0–2.55 · "Durante 100 anos" — contador serifado -->
+<div class="sc marrom" id="s1"><div class="cam" id="c1">
+  <div class="k" id="s1k" style="position:absolute; left:0; width:1920px; top:250px; text-align:center; opacity:0;">De propaganda</div>
+  <div class="serif" id="s1n" style="position:absolute; left:0; width:1920px; top:300px; text-align:center; font-size:330px; line-height:1; opacity:0;">
+    <span id="s1num">0</span><span style="font-size:130px; color:var(--coral); margin-left:22px;">anos</span></div>
+  <div class="linha" id="s1l" style="left:560px; top:760px; width:800px;"></div>
+  <div class="serif" id="s1a" style="position:absolute; left:500px; top:790px; font-size:40px; opacity:0; color:#B9A9A3;">1926</div>
+  <div class="serif" id="s1b" style="position:absolute; left:1330px; top:790px; font-size:40px; opacity:0; color:var(--coral2);">hoje</div>
+  <div class="po" id="s1d" style="left:1352px; top:752px; width:18px; height:18px; background:var(--coral2); box-shadow:0 0 22px var(--coral); opacity:0;"></div>
+</div></div>
+
+<!-- S3 4.6–9.2 · Cor, música, história, gatilho, contagem regressiva -->
+<div class="sc marrom" id="s3"><div class="cam" id="c3"></div></div>
+
+<!-- S4 12.6–15.5 · não se emociona com nada disso -->
+<div class="sc azul" id="s4"><div class="cam" id="c4"></div></div>
+
+<!-- S5 15.5–18.9 · agente de inteligência artificial -->
+<div class="sc azul" id="s5"><div class="cam" id="c5">
+  <div class="po anel" style="left:860px; top:290px; width:200px; height:200px; border:2px solid rgba(216,114,89,.6);"></div>
+  <div class="po anel" style="left:860px; top:290px; width:200px; height:200px; border:2px solid rgba(216,114,89,.6);"></div>
+  <div class="po anel" style="left:860px; top:290px; width:200px; height:200px; border:2px solid rgba(216,114,89,.6);"></div>
+  <div class="sq" id="s5q" style="left:840px; top:270px; width:240px; height:240px; border-radius:62px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bot"/></svg></div></div>
+  <div class="k" id="s5k" style="position:absolute; left:0; width:1920px; top:600px; text-align:center; opacity:0;">O comprador novo</div>
+  <div class="serif" id="s5t" style="position:absolute; left:0; width:1920px; top:650px; text-align:center; font-size:120px; opacity:0;">Agente de <span style="color:var(--coral)">IA</span></div>
+</div></div>
+
+<!-- S6 21.8–25.3 · cliente → agente → empresas -->
+<div class="sc marrom" id="s6"><div class="cam" id="c6">
+  <div class="linha" id="s6l1" style="left:470px; top:539px; width:330px;"></div>
+  <div class="linha" id="s6l2" style="left:1020px; top:539px; width:300px; transform:rotate(-28deg) scaleX(0);"></div>
+  <div class="linha" id="s6l3" style="left:1020px; top:539px; width:270px;"></div>
+  <div class="linha" id="s6l4" style="left:1020px; top:539px; width:300px; transform:rotate(28deg) scaleX(0);"></div>
+  <div class="sq" id="s6a" style="left:270px; top:440px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-user"/></svg></div></div>
+  <div class="lab" id="s6al" style="left:210px; top:670px;">Cliente</div>
+  <div class="sq" id="s6b" style="left:810px; top:430px; width:220px; height:220px; border-radius:58px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bot"/></svg></div></div>
+  <div class="lab" id="s6bl" style="left:760px; top:680px;">Agente de IA</div>
+  <div class="card emp" id="e1" style="left:1290px; top:205px; width:420px; height:150px;"></div>
+  <div class="card emp" id="e2" style="left:1300px; top:465px; width:420px; height:150px;"></div>
+  <div class="card emp" id="e3" style="left:1290px; top:725px; width:420px; height:150px;"></div>
+  <div class="chip" id="s6c" style="left:1395px; top:395px; font-size:22px; padding:8px 18px; background:#2A1A18;">MELHOR OPÇÃO</div>
+</div></div>
+
+<!-- S7 26.9–29.5 · B2A -->
+<div class="sc preto" id="s7"><div class="cam" id="c7">
+  <div class="serif" id="s7t" style="position:absolute; left:175px; top:330px; font-size:260px; line-height:1; opacity:0;">B2<span style="color:var(--coral)">A</span></div>
+  <div class="k" id="s7k" style="position:absolute; left:182px; top:640px; opacity:0;">De empresa para agentes</div>
+  <div class="linha" id="s7l" style="left:1335px; top:539px; width:150px;"></div>
+  <div class="sq" id="s7a" style="left:1110px; top:420px; width:240px; height:240px; border-radius:62px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-loja"/></svg></div></div>
+  <div class="sq lisa" id="s7b" style="left:1490px; top:420px; width:240px; height:240px; border-radius:62px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bot"/></svg></div></div>
+</div></div>
+
+<!-- S8 31.0–37.4 · o que você vai ver -->
+<div class="sc marrom" id="s8"><div class="cam" id="c8"></div></div>
+
+<!-- S9 41.0–47.3 · o erro que faz a IA descartar a sua empresa -->
+<div class="sc creme" id="s9"><div class="cam" id="c9">
+  <div class="branco" id="s9c" style="left:330px; top:300px; width:640px; height:480px; padding:56px 60px;">
+    <div style="display:flex; align-items:center; gap:30px;">
+      <div style="width:120px; height:120px; border-radius:32px; background:linear-gradient(160deg,#F09878,#D86A50 60%,#C2563E); display:flex; align-items:center; justify-content:center; box-shadow:0 12px 26px rgba(216,114,89,.4);">
+        <svg viewBox="0 0 24 24" width="66" height="66" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-loja"/></svg></div>
+      <div><div style="font-size:46px; font-weight:700;">Sua empresa</div><div style="font-size:30px; color:#7A6E6A; margin-top:6px;">Centro · aberta agora</div></div>
+    </div>
+    <div style="margin-top:56px; display:flex; align-items:baseline; gap:20px;"><span class="serif" style="font-size:150px; line-height:1;">4,9</span>
+      <span style="font-size:52px; color:#E7A23B; letter-spacing:6px;">★★★★★</span></div>
+    <div style="font-size:30px; color:#7A6E6A; margin-top:12px;">312 avaliações</div>
+  </div>
+  <div class="px-alvo" id="s9px"></div>
+  <div class="linha" id="s9l" style="left:990px; top:539px; width:380px;"></div>
+  <div class="chip" id="s9e" style="left:1030px; top:470px; color:var(--no); border-color:var(--no); background:#FFF; font-size:24px; padding:9px 20px;">1 ERRO</div>
+  <div class="sq" id="s9q" style="left:1390px; top:430px; width:220px; height:220px; border-radius:58px; background:linear-gradient(160deg,#3A3236,#241D20);"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bot"/></svg></div></div>
+  <div class="badge no" id="s9x" style="left:925px; top:270px; width:96px; height:96px;"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round"><use href="#i-x"/></svg></div>
+  <div class="serif" id="s9t" style="position:absolute; left:330px; top:820px; width:640px; text-align:center; font-size:72px; color:var(--no); opacity:0;">Descartada</div>
+</div></div>
+
+<!-- S10 48.9–50.6 · melhor da sua cidade -->
+<div class="sc azul" id="s10"><div class="cam" id="c10">
+  <div class="card" id="s10c" style="left:610px; top:330px; width:700px; height:420px;">
+    <div class="sq" id="s10q" style="left:60px; top:110px; width:200px; height:200px; opacity:1; box-shadow:0 20px 40px rgba(0,0,0,.4), inset 0 2px 0 rgba(255,255,255,.12);"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-medalha"/></svg></div></div>
+    <div class="serif" style="position:absolute; left:310px; top:95px; font-size:150px; line-height:1;">Nº <span style="color:var(--coral)">1</span></div>
+    <div style="position:absolute; left:316px; top:265px; font-size:38px; font-weight:600; color:#D9D2CE;">da sua cidade</div>
+  </div>
+</div></div>
+
+<!-- S11 50.6–53.7 · Passo 1 · O que mudou -->
+<div class="sc preto" id="s11"><div class="cam" id="c11">
+  <div class="serif" id="s11t" style="position:absolute; left:175px; top:410px; font-size:150px; line-height:1; opacity:0;">Passo <span style="color:var(--coral)">1</span></div>
+  <div class="k" id="s11k" style="position:absolute; left:180px; top:600px; opacity:0;">O que mudou</div>
+  <div class="linha" id="s11l" style="left:1335px; top:539px; width:150px;"></div>
+  <div class="sq" id="s11a" style="left:1110px; top:420px; width:240px; height:240px; border-radius:62px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-lupa"/></svg></div></div>
+  <div class="sq lisa" id="s11b" style="left:1490px; top:420px; width:240px; height:240px; border-radius:62px;"><div class="in"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bot"/></svg></div></div>
+</div></div>
+
+<!-- S12 55.4–59.2 · ANTES: pesquisava numa lista -->
+<div class="sc creme" id="s12"><div class="cam" id="c12">
+  <div class="chip" id="s12k" style="left:860px; top:96px;">ANTES</div>
+  <div class="jan" id="s12j" style="left:410px; top:190px; width:1100px; height:800px;">
+    <div class="bar"><i style="background:#FF5F57"></i><i style="background:#FEBC2E"></i><i style="background:#28C840"></i></div>
+    <div style="margin:34px 44px 0; height:74px; border-radius:37px; background:#2A2A2D; display:flex; align-items:center; gap:18px; padding:0 30px; font-size:30px;">
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#9A9490" stroke-width="2.2" stroke-linecap="round"><use href="#i-lupa"/></svg>
+      <span id="s12b"></span><span id="s12cur" style="display:inline-block; width:2px; height:34px; background:var(--coral);"></span></div>
+    <div id="s12r" style="margin:26px 44px 0;"></div>
+  </div>
+  <svg class="cur" id="s12m" viewBox="0 0 24 24" style="left:1380px; top:880px;"><path d="M4 2 L4 19 L8.5 14.8 L11.6 21.4 L14.2 20.2 L11.1 13.7 L17 13.5 Z" fill="#fff" stroke="#111" stroke-width="1.3" stroke-linejoin="round"/></svg>
+</div></div>
+
+<!-- S13 61.3–64.95 · HOJE: pergunta pra IA (carro) -->
+<div class="sc marrom" id="s13"><div class="cam" id="c13">
+  <div class="chip" id="s13k" style="left:875px; top:96px;">HOJE</div>
+  <div class="jan" id="s13j" style="left:360px; top:190px; width:1200px; height:800px;">
+    <div class="bar"><i style="background:#3A3A3E"></i><i style="background:#3A3A3E"></i><i style="background:#3A3A3E"></i></div>
+    <div id="s13u" style="position:absolute; right:48px; top:96px; max-width:760px; padding:22px 30px; border-radius:26px; background:#2C2C30; font-size:36px; font-weight:500;"><span id="s13b"></span></div>
+    <div id="s13ag" style="position:absolute; left:48px; top:230px; display:flex; align-items:center; gap:18px; opacity:0;">
+      <div style="width:64px; height:64px; border-radius:18px; background:linear-gradient(160deg,#F09878,#D86A50); display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bot"/></svg></div>
+      <div style="font-size:30px; color:#A39C98;">Comparando as opções…</div></div>
+    <div id="s13o" style="position:absolute; left:48px; top:340px; width:1104px; height:400px;"></div>
+  </div>
+</div></div>
+
+<!-- S14 64.95–67.9 · HOJE: clínica aqui perto -->
+<div class="sc marrom" id="s14"><div class="cam" id="c14">
+  <div class="jan" id="s14j" style="left:360px; top:190px; width:1200px; height:800px;">
+    <div class="bar"><i style="background:#3A3A3E"></i><i style="background:#3A3A3E"></i><i style="background:#3A3A3E"></i></div>
+    <div style="position:absolute; right:48px; top:96px; max-width:760px; padding:22px 30px; border-radius:26px; background:#2C2C30; font-size:36px; font-weight:500;"><span id="s14b"></span></div>
+    <div id="s14ag" style="position:absolute; left:48px; top:230px; display:flex; align-items:center; gap:18px; opacity:0;">
+      <div style="width:64px; height:64px; border-radius:18px; background:linear-gradient(160deg,#F09878,#D86A50); display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bot"/></svg></div>
+      <div style="font-size:30px; color:#A39C98;">Comparando avaliações, preço e prazo</div></div>
+    <div class="card" id="s14p" style="left:400px; top:330px; width:400px; height:360px; background:linear-gradient(160deg, rgba(70,52,50,.9), rgba(44,32,32,.92));">
+      <svg viewBox="0 0 200 200" style="position:absolute; left:80px; top:30px; width:240px; height:240px;">
+        <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="12"/>
+        <circle id="s14arc" cx="100" cy="100" r="80" fill="none" stroke="#DC6658" stroke-width="12" stroke-linecap="round" stroke-dasharray="502.65" stroke-dashoffset="502.65" transform="rotate(-90 100 100)"/></svg>
+      <div class="serif" style="position:absolute; left:0; width:400px; top:105px; text-align:center; font-size:84px; line-height:1;"><span id="s14n">0</span><span style="font-size:40px; color:var(--coral);">%</span></div>
+      <div style="position:absolute; left:0; width:400px; top:290px; text-align:center; font-size:28px; color:#B5ABA7;">clínicas analisadas</div>
+    </div>
+  </div>
+</div></div>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-bot" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4"/><circle cx="12" cy="3.2" r="1"/><circle cx="9" cy="14" r="1.1"/><circle cx="15" cy="14" r="1.1"/><path d="M2 13v3M22 13v3"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+  <symbol id="i-loja" viewBox="0 0 24 24"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"/><path d="M5 13v8h14v-8"/><path d="M10 21v-5h4v5"/></symbol>
+  <symbol id="i-lupa" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-cor" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 2-.8 2-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4c0-4.4-4-8-9-8z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10.5" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></symbol>
+  <symbol id="i-musica" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></symbol>
+  <symbol id="i-livro" viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 21.5A2.5 2.5 0 0 1 6.5 19H20v3H6.5"/></symbol>
+  <symbol id="i-raio" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
+  <symbol id="i-relogio" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></symbol>
+  <symbol id="i-carro" viewBox="0 0 24 24"><path d="M5 17h14v-4l-2-5H7l-2 5z"/><circle cx="8" cy="17" r="2"/><circle cx="16" cy="17" r="2"/><path d="M5 13h14"/></symbol>
+  <symbol id="i-medalha" viewBox="0 0 24 24"><circle cx="12" cy="15" r="6"/><path d="M8.5 9.5L6 2h4l2 5 2-5h4l-2.5 7.5"/><path d="M12 12.5v5"/></symbol>
+</svg>
+
+<script>
+const R = (s) => document.querySelector(s);
+const tl = gsap.timeline({ paused: true });
+const svg = (id, extra = '') => `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ${extra}><use href="#${id}"/></svg>`;
+const sqHTML = (id, x, y, s = 200, lisa = false) => `<div class="sq${lisa ? ' lisa' : ''}" style="left:${x}px; top:${y}px; width:${s}px; height:${s}px; border-radius:${s * .26}px;"><div class="in">${svg(id)}</div></div>`;
+// poeira parada nos fundos escuros (semente fixa)
+let sem = 7; const rnd = () => (sem = (sem * 16807) % 2147483647) / 2147483647;
+document.querySelectorAll('.sc.preto, .sc.marrom, .sc.azul').forEach((sc) => {
+  for (let i = 0; i < 70; i++) { const d = document.createElement('div'); const z = 2 + rnd() * 3.5;
+    const cor = ['#D87259', '#7E8BB0', '#C9B6A8', '#B04A3A'][Math.floor(rnd() * 4)];
+    d.className = 'po'; d.style.cssText = `left:${rnd() * 1920}px; top:${rnd() * 1080}px; width:${z}px; height:${z}px; background:${cor}; opacity:${.25 + rnd() * .5};`;
+    sc.insertBefore(d, sc.firstChild); }
+});
+const mostra = (id, a, b) => { tl.set(id, { opacity: 1 }, a); tl.set(id, { opacity: 0 }, b); tl.fromTo(id + ' > .cam', { scale: 1 }, { scale: 1.045, duration: b - a, ease: 'none' }, a); };
+const pop = (s, t, d = .5) => tl.fromTo(s, { opacity: 0, scale: .72, y: 18 }, { opacity: 1, scale: 1, y: 0, duration: d, ease: 'back.out(1.9)' }, t);
+const entra = (s, t, y = 26, d = .55) => tl.fromTo(s, { opacity: 0, y, filter: 'blur(10px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: d, ease: 'power3.out' }, t);
+const linha = (s, t, d = .45) => tl.to(s, { scaleX: 1, duration: d, ease: 'power2.inOut' }, t);
+const digita = (s, txt, t0, t1) => { const el = R(s); el.innerHTML = [...txt].map((c) => `<span class="c">${c}</span>`).join('');
+  const cs = el.querySelectorAll('.c'); cs.forEach((c, i) => tl.set(c, { display: 'inline' }, t0 + (t1 - t0) * i / cs.length)); };
+const conta = (s, de, ate, t, d, fmt = (v) => Math.round(v)) => { const o = { v: de }; tl.to(o, { v: ate, duration: d, ease: 'power2.out', onUpdate: () => { R(s).textContent = fmt(o.v); } }, t); };
+const pixela = (alvo, cont, t, x0, y0, w, h, dx = 420) => {   // a peça vira quadradinhos que voam pra direita
+  for (let i = 0; i < 26; i++) { const p = document.createElement('div'); p.className = 'px'; const z = 12 + rnd() * 16;
+    p.style.cssText = `left:${x0 + rnd() * w}px; top:${y0 + rnd() * h}px; width:${z}px; height:${z}px; background:${rnd() > .5 ? '#E9DCD6' : '#D87259'};`;
+    R(cont).appendChild(p);
+    tl.fromTo(p, { opacity: 0 }, { opacity: 1, duration: .05 }, t + rnd() * .2);
+    tl.to(p, { x: dx * (.5 + rnd()), y: (rnd() - .5) * 160, opacity: 0, duration: .55 + rnd() * .3, ease: 'power2.in' }, t + .1 + rnd() * .25); }
+  tl.to(alvo, { opacity: 0, scale: .96, filter: 'blur(6px)', duration: .3 }, t + .15);
+};
+
+// ---------- S1 0–2.55
+mostra('#s1', 0, 2.55);
+entra('#s1n', 0.0, 30, .5); conta('#s1num', 0, 100, 0.12, 1.1);
+entra('#s1k', 0.25); linha('#s1l', 0.9, .9); entra('#s1a', 0.9, 14, .4); entra('#s1b', 1.6, 14, .4); pop('#s1d', 1.7, .4);
+
+// ---------- S3 4.6–9.2 · cinco gatilhos emocionais
+mostra('#s3', 4.6, 9.2);
+const OFF = '0 30px 60px rgba(0,0,0,.55), 0 0 0 0 rgba(216,114,89,0), 0 0 0 rgba(216,114,89,0)', ON = '0 30px 60px rgba(0,0,0,.55), 0 0 0 3px rgba(216,114,89,.9), 0 0 60px rgba(216,114,89,.45)';
+const G = [['i-cor', 'Cor', 4.76], ['i-musica', 'Música', 5.70], ['i-livro', 'História', 6.40], ['i-raio', 'Gatilho', 7.18], ['i-relogio', 'Contagem regressiva', 7.96]];
+G.forEach(([ic, nome, t], i) => { const x = 210 + i * 320;
+  R('#c3').insertAdjacentHTML('beforeend', sqHTML(ic, x, 380) + `<div class="lab" style="left:${x - 60}px; top:620px; font-size:${i === 4 ? 30 : 34}px;">${nome}</div>`);
+  const sq = R('#c3').querySelectorAll('.sq')[i], lb = R('#c3').querySelectorAll('.lab')[i];
+  pop(sq, t - .06); entra(lb, t, 14, .4);
+  tl.to(sq, { boxShadow: ON, duration: .25 }, t); if (i < 4) tl.to(sq, { boxShadow: OFF, duration: .3 }, G[i + 1][2]);
+});
+
+// ---------- S4 12.6–15.5 · ele não se emociona com nada disso
+mostra('#s4', 12.6, 15.5);
+G.forEach(([ic, nome], i) => { const x = 330 + i * 270;
+  R('#c4').insertAdjacentHTML('beforeend', sqHTML(ic, x, 440, 170) + `<div class="badge no" style="left:${x + 120}px; top:410px;">${svg('i-x')}</div>`);
+  const sq = R('#c4').querySelectorAll('.sq')[i], bd = R('#c4').querySelectorAll('.badge')[i];
+  pop(sq, 12.62 + i * .07, .4);
+  tl.to(sq, { filter: 'grayscale(1) brightness(.6)', duration: .35 }, 13.44 + i * .12);
+  pop(bd, 13.9 + i * .2, .35);
+});
+pixela('#c4 .sq, #c4 .badge', '#c4', 14.95, 330, 420, 1250, 200, 520);
+
+// ---------- S5 15.5–18.9 · agente de IA
+mostra('#s5', 15.5, 18.9);
+pop('#s5q', 15.55, .6);
+document.querySelectorAll('#s5 .anel').forEach((a, i) => tl.fromTo(a, { scale: 1.1, opacity: .8 }, { scale: 2.4, opacity: 0, duration: 1.6, ease: 'power1.out', repeat: 1 }, 15.7 + i * .55));
+entra('#s5k', 15.62); entra('#s5t', 16.1, 30);
+
+// ---------- S6 21.8–25.3 · o agente decide
+mostra('#s6', 21.8, 25.3);
+['A', 'B', 'C'].forEach((l, i) => { R('#e' + (i + 1)).innerHTML = `<div style="position:absolute; left:26px; top:25px; width:100px; height:100px; border-radius:26px; background:linear-gradient(160deg,#4A3F42,#2E2629); display:flex; align-items:center; justify-content:center;">${svg('i-loja', 'style="width:56px; height:56px; stroke:#D87259"')}</div>
+  <div style="position:absolute; left:156px; top:34px; font-size:38px; font-weight:700;">Empresa ${l}</div><div style="position:absolute; left:156px; top:88px; font-size:26px; color:#B5ABA7;">★ ${['4,6', '4,9', '4,7'][i]} · ${['R$ 180', 'R$ 150', 'R$ 210'][i]}</div>`; });
+pop('#s6a', 21.82); entra('#s6al', 21.9, 12, .35); linha('#s6l1', 21.95, .4); pop('#s6b', 22.15); entra('#s6bl', 22.25, 12, .35);
+linha('#s6l2', 22.4, .35); linha('#s6l3', 22.45, .35); linha('#s6l4', 22.5, .35);
+pop('#e1', 22.4); pop('#e2', 22.5); pop('#e3', 22.6);
+tl.to('#e2', { borderColor: 'rgba(216,114,89,.95)', boxShadow: '0 40px 80px rgba(0,0,0,.55), 0 0 50px rgba(216,114,89,.35)', duration: .25 }, 23.7); tl.to('#e2', { scale: 1.06, duration: .4, ease: 'back.out(2)' }, 23.7); pop('#s6c', 23.75, .4);
+R('#c6').insertAdjacentHTML('beforeend', `<div class="badge ok" id="s6ok" style="left:1680px; top:440px;">${svg('i-ok')}</div><div class="badge no" id="s6x1" style="left:1670px; top:180px;">${svg('i-x')}</div><div class="badge no" id="s6x3" style="left:1670px; top:700px;">${svg('i-x')}</div>`);
+pop('#s6ok', 23.9, .35);
+tl.to(['#e1', '#e3'], { opacity: .35, filter: 'grayscale(1)', duration: .3 }, 24.72); pop('#s6x1', 24.72, .35); pop('#s6x3', 24.82, .35);
+
+// ---------- S7 26.9–29.5 · B2A
+mostra('#s7', 26.9, 29.5);
+entra('#s7t', 27.0, 30, .6); entra('#s7k', 28.05, 16, .45); pop('#s7a', 27.3); linha('#s7l', 27.7, .35); pop('#s7b', 28.0);
+tl.to('#s7b', { boxShadow: ON, duration: .4 }, 28.5);
+
+// ---------- S8 31.0–37.4 · o que você vai ver
+mostra('#s8', 31.0, 37.4);
+const L = [['O que é o B2A', 31.25], ['Por que já está acontecendo', 32.55], ['O que fazer hoje, no básico', 34.6]];
+L.forEach(([txt, t], i) => { const y = 270 + i * 190;
+  R('#c8').insertAdjacentHTML('beforeend', `<div class="card it" style="left:460px; top:${y}px; width:1000px; height:150px;">
+    <div style="position:absolute; left:34px; top:35px; width:80px; height:80px; border-radius:22px; background:linear-gradient(160deg,#F09878,#D86A50); display:flex; align-items:center; justify-content:center; font-family:Newsreader,serif; font-size:52px;">${i + 1}</div>
+    <div style="position:absolute; left:150px; top:46px; font-size:46px; font-weight:600;">${txt}</div>
+    <div class="badge ok tk" style="left:900px; top:43px;">${svg('i-ok')}</div></div>`);
+  const c = R('#c8').querySelectorAll('.it')[i]; entra(c, t, 30, .5);
+  pop(c.querySelector('.tk'), 35.9 + i * .3, .35);
+});
+tl.to(R('#c8').querySelectorAll('.it')[2], { borderColor: 'rgba(216,114,89,.95)', boxShadow: '0 40px 80px rgba(0,0,0,.55), 0 0 50px rgba(216,114,89,.35)', duration: .3 }, 34.75);
+
+// ---------- S9 41.0–47.3 · o erro que descarta
+mostra('#s9', 41.0, 47.3);
+pop('#s9c', 41.05, .6); pop('#s9q', 41.6); linha('#s9l', 42.0, .5);
+pop('#s9e', 43.31, .4);
+tl.to('#s9c', { x: -14, duration: .06, yoyo: true, repeat: 5, ease: 'none' }, 44.51); tl.to('#s9c', { x: 0, duration: .05 }, 44.9);
+tl.to('#s9c', { filter: 'grayscale(1)', opacity: .75, duration: .3 }, 44.6); pop('#s9x', 44.6, .4);
+pixela('#s9c, #s9x', '#c9', 45.55, 330, 300, 640, 480, -520);
+entra('#s9t', 46.0, 20, .45);
+
+// ---------- S10 48.9–50.6 · nº 1 da cidade
+mostra('#s10', 48.9, 50.6);
+pop('#s10c', 48.95, .55);
+
+// ---------- S11 50.6–53.7 · Passo 1
+mostra('#s11', 50.6, 53.7);
+entra('#s11t', 50.7, 30, .6); entra('#s11k', 51.0, 16, .45); pop('#s11a', 51.8); linha('#s11l', 52.1, .35); pop('#s11b', 52.35);
+tl.to('#s11b', { boxShadow: ON, duration: .4 }, 53.29);
+
+// ---------- S12 55.4–59.2 · ANTES
+mostra('#s12', 55.4, 59.2);
+pop('#s12k', 55.45, .4); entra('#s12j', 55.45, 40, .5);
+digita('#s12b', 'melhor clínica perto de mim', 55.75, 56.45);
+const RES = ['Clínica Vida — agende online', 'Odonto Centro · avaliações', 'As 10 melhores clínicas da cidade', 'Clínica São Lucas — horários', 'Sorriso Mais · fale conosco'];
+RES.forEach((txt, i) => { R('#s12r').insertAdjacentHTML('beforeend', `<div class="res" style="position:relative; height:110px; padding:18px 26px; border-radius:18px; margin-bottom:10px; opacity:0; border:2px solid transparent;">
+  <div style="width:${180 + (i * 37) % 120}px; height:14px; border-radius:7px; background:#3A3A3E;"></div>
+  <div style="font-size:32px; color:#E8D2C8; margin-top:14px;">${txt}</div></div>`);
+  entra(R('#s12r').querySelectorAll('.res')[i], 56.55 + i * .14, 16, .35); });
+tl.fromTo('#s12m', { opacity: 0 }, { opacity: 1, duration: .15 }, 57.5);
+tl.to('#s12m', { x: -480, y: -360, duration: .7, ease: 'power2.inOut' }, 57.55);
+tl.to('#s12m', { scale: .82, duration: .08, yoyo: true, repeat: 1 }, 58.27);
+tl.to(R('#s12r').querySelectorAll('.res')[1], { borderColor: '#D87259', backgroundColor: 'rgba(216,114,89,.12)', duration: .2 }, 58.3);
+
+// ---------- S13 61.3–64.95 · HOJE (carro)
+mostra('#s13', 61.3, 64.95);
+pop('#s13k', 61.35, .4); entra('#s13j', 61.35, 40, .5);
+digita('#s13b', 'Qual o melhor carro para comprar?', 61.6, 62.7);
+entra('#s13ag', 62.8, 14, .35);
+['A', 'B', 'C'].forEach((l, i) => { R('#s13o').insertAdjacentHTML('beforeend', `<div class="card op" style="left:${i * 380}px; top:0; width:344px; height:380px;">
+  <div style="position:absolute; left:110px; top:60px; width:124px; height:124px; border-radius:34px; background:linear-gradient(160deg,#4A3F42,#2E2629); display:flex; align-items:center; justify-content:center;">${svg('i-carro', 'style="width:74px; height:74px; stroke:#EE9471"')}</div>
+  <div class="serif" style="position:absolute; left:0; width:344px; top:210px; text-align:center; font-size:96px; line-height:1;">${l}</div></div>`);
+  pop(R('#s13o').querySelectorAll('.op')[i], [63.27, 63.69, 64.43][i], .45); });
+
+// ---------- S14 64.95–67.9 · HOJE (clínica)
+mostra('#s14', 64.95, 67.9);
+tl.set('#s14j', { opacity: 1 }, 64.95);
+digita('#s14b', 'Qual a melhor clínica aqui perto?', 65.05, 66.6);
+entra('#s14ag', 66.65, 14, .35); pop('#s14p', 66.75, .45);
+tl.to('#s14arc', { strokeDashoffset: 0, duration: 1.05, ease: 'power2.out' }, 66.8); conta('#s14n', 0, 100, 66.8, 1.05);
+
+tl.set({}, {}, 70.85);
+window.__timelines = window.__timelines || {};
+window.__timelines['main'] = tl;
+tl.seek(0);
+</script>
+</body></html>
