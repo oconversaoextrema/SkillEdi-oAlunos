@@ -1,33 +1,37 @@
 # -*- coding: utf-8 -*-
 """Montagem do REELS no estilo LABS (references/padrao-tessmann-reels-labs.md), 1080x1920: alterna três modos —
-R = pessoa em tela cheia, M = motion em tela cheia, D = dividida (metade de cima do motion + pessoa RECORTADA embaixo,
-com o fundo dela dissolvendo num degradê da cor do motion, sem linha de divisão). Punch-in alternado na pessoa,
-transições (clarão leitoso pessoa→motion e em capítulo, chicote motion→motion, desfoque →pessoa), ACABAMENTO só no
-motion (retícula a 45° nos tons médios, aberração, glow, grão mínimo, vinheta) e áudio (voz + trilha baixa contínua +
-efeitos + whoosh das transições).
+R = pessoa em tela cheia, M = motion em tela cheia, D = dividida NORMAL (metade de cima do motion, 1080x960, e a
+pessoa na metade de baixo, 1080x960, com uma sombra suave na emenda). Punch-in alternado na pessoa, transições (clarão
+leitoso pessoa→motion e em capítulo, chicote motion→motion, desfoque →pessoa), ACABAMENTO só no motion (retícula a 45°
+nos tons médios, aberração, glow, grão mínimo, vinheta) e áudio (voz + trilha baixa contínua + efeitos). Som das
+transições (aprovado 03/11/2026): clique "mágico" no clarão e clique "orgânico" (5 variações) no chicote e no desfoque,
+todos os efeitos a −6 dB (sfx_ganho 0,5).
 
 uso:  python work/labs_reels_compor.py work/<video>/labs-reels.json [--quadros t1,t2,...]
 
 labs-reels.json:
 {
   "pessoa": "work/<video>/base.mp4",          vídeo da pessoa já cortado, 1080x1920 (com a voz)
-  "recorte": "work/<video>/pessoa-rc.webm",   recorte com alfa (recortar_pessoa.py --degrade): da orelha pra cima
-                                              transparente, fundo real embaixo. Se for o quadro inteiro (1080x1920), a
-                                              montagem usa a faixa 1080x1080 que começa em "recorte_topo"
-  "recorte_topo": 420,                        (opcional) linha do quadro inteiro onde a faixa começa: ~150 px acima do
-                                              alto da cabeça
+  "metade": "work/<video>/metade.mp4",        (opcional, recomendado se o bruto é DEITADO) vídeo 1080x960 da pessoa
+                                              enquadrada pra metade de baixo, tirado do quadro deitado (mais folga que
+                                              cortar do vertical): cabeça inteira, rosto a ~1/3 da altura
+  "metade_topo": 200,                         (sem "metade") linha do vídeo 1080x1920 onde começa a faixa 1080x960:
+                                              ~150 px acima do alto da cabeça. Padrão: centro[1] - 400
   "motion": "work/<video>/motion.mp4",        render do HyperFrames (modelo hyperframes-labs-reels), MESMA duração
   "saida": "saidas/<titulo>.mp4",
   "cenas": [[0, 4.5, "D", 0], [4.5, 6.3, "R", 0], [14.3, 16, "M", 1]],   [início, fim, modo R/M/D, capítulo? 1/0];
                                               o que não estiver listado é R
   "cortes": [12.3, 40.1],                     (opcional) cortes do vídeo da pessoa, pra trocar o punch-in
   "centro": [540, 600],                       (opcional) ponto do zoom na tela cheia (rosto)
-  "recorte_y": 900,                           (opcional) onde o quadro do recorte começa na tela (900 = cabeça logo
-                                              abaixo do fim do conteúdo da metade de cima, que vai até ~y 925)
   "trilha": "trilhas/<musica>.mp3",           (opcional) trilha contínua, ~16 dB abaixo da voz
   "nivel_trilha": 0.16,
-  "efeitos_dir": "trilhas/efeitos",           (opcional) pasta dos .wav: pop, click, tick, whoosh_in, whoosh2, whoosh_out…
-  "efeitos": [[0.9, "pop", 0.3]]              [tempo, nome do .wav sem extensão, ganho]
+  "efeitos_dir": "trilhas/efeitos",           (opcional) pasta dos .wav. Precisa de click-organico.wav (clique com
+                                              reverb, 5 variações em 0 / 1,4 / 2,65 / 4,25 / 5,7 s) e click-magico.wav
+                                              (clique de menu) pras transições; os outros (pop, tick, click, sucesso…)
+                                              são opcionais
+  "efeitos": [[0.9, "pop", 0.3], [3.8, "magico", 0.3], [5.3, "organico", 1.3]],
+                                              [tempo, nome do .wav sem extensão (ou "organico"/"magico"), ganho]
+  "sfx_ganho": 0.5                            (opcional) multiplica TODOS os efeitos e transições (0,5 = −6 dB)
 }"""
 import os, sys, json, subprocess, wave
 from pathlib import Path
@@ -37,7 +41,7 @@ from ambiente import FFMPEG as FF
 
 CFG = json.loads(Path(sys.argv[1]).read_text())
 FPS, W, H = 30, 1080, 1920
-PESSOA, RECORTE, MOTION = CFG['pessoa'], CFG['recorte'], CFG['motion']
+PESSOA, MOTION = CFG['pessoa'], CFG['motion']
 _s = av.open(PESSOA).streams.video[0]
 DUR = float(_s.duration * _s.time_base)
 N = int(round(DUR * FPS))
@@ -60,7 +64,8 @@ for i in range(1, N):
     elif i in CAP or MODO[i - 1] == 'R': TR[i] = 'clarao'
     else: TR[i] = 'whip'
 CX, CY = CFG.get('centro', [540, 600])
-RC_Y = CFG.get('recorte_y', 900)
+MT = int(min(max(CFG.get('metade_topo', CY - 400), 0), H - 960))
+METADE = CFG.get('metade')
 
 def zoom(img, s, cx, cy):
     if s == 1: return img
@@ -89,15 +94,16 @@ def acabamento(img):
     f = f + rng.normal(0, .004, (Hh, W, 1)).astype(np.float32)
     return np.clip(f * 255, 0, 255).astype(np.uint8)
 
-# dividida: a pessoa recortada por cima de um degradê que continua o fundo do motion. Nunca repetir linhas do vídeo
-# dela pra "descer" o quadro (duplica a cabeça no degradê) nem fundir o vídeo inteiro (aparece a linha da divisão).
-def emenda(cima, rc, s):
-    cor = cv2.GaussianBlur(cima[-12:].astype(np.float32).mean(axis=0, keepdims=True), (0, 0), 25)
-    fundo = np.vstack([cima[RC_Y:].astype(np.float32), np.repeat(cor, 1080 - (960 - RC_Y), axis=0)])
-    rc = zoom(rc, s, 540, 120)   # o punch cresce pra baixo: a cabeça não sobe no conteúdo do motion
-    a = rc[..., 3:4].astype(np.float32) / 255
-    out = rc[..., :3].astype(np.float32) * a + fundo * (1 - a)
-    return out.astype(np.uint8)[:H - RC_Y]
+# dividida normal: a pessoa na metade de baixo, com uma sombra suave no alto (a emenda não fica seca)
+SOMBRA = (1 - .45 * np.clip(1 - np.arange(960, dtype=np.float32) / 40, 0, 1))[:, None, None]
+def metade(p, s):
+    if METADE:   # vídeo próprio da metade, 1080x960: zoom no rosto a ~1/3 da altura
+        if p.shape[:2] != (960, W): p = cv2.resize(p, (W, 960), interpolation=cv2.INTER_LANCZOS4)
+        b = zoom(p, s, 540, 330)
+    else:
+        if p.shape[:2] != (H, W): p = cv2.resize(p, (W, H), interpolation=cv2.INTER_LANCZOS4)
+        b = zoom(np.ascontiguousarray(p[MT:MT + 960]), s, CX, min(max(CY - MT, 0), 959))
+    return (b.astype(np.float32) * SOMBRA).astype(np.uint8)
 
 def borra(img, s): return img if s <= 0 else cv2.GaussianBlur(img, (0, 0), s)
 def leitoso(img, a, cor=(196, 214, 232)): return cv2.addWeighted(img, 1 - a, np.full_like(img, cor), a, 0)   # creme quente
@@ -109,19 +115,8 @@ def quadros(path):
     c = av.open(path); s = c.streams.video[0]; s.thread_type = 'AUTO'
     for fr in c.decode(s): yield fr.to_ndarray(format='bgr24')
     c.close()
-def recorte():   # o decodificador nativo do PyAV ignora o alfa do VP9: ler pelo libvpx do ffmpeg
-    st = av.open(RECORTE).streams.video[0]
-    vf = 'scale=1080:1080' if st.height == st.width else f"scale=1080:-2,crop=1080:1080:0:{CFG.get('recorte_topo', 420)}"
-    pr = subprocess.Popen([FF, '-loglevel', 'error', '-c:v', 'libvpx-vp9', '-i', RECORTE, '-vf', vf,
-                           '-f', 'rawvideo', '-pix_fmt', 'bgra', '-'], stdout=subprocess.PIPE)
-    while True:
-        b = pr.stdout.read(1080 * 1080 * 4)
-        if len(b) < 1080 * 1080 * 4: break
-        yield np.frombuffer(b, np.uint8).reshape(1080, 1080, 4)
-    pr.kill()
-
 def video(saida, so=None):
-    gens = {'p': quadros(PESSOA), 'm': quadros(MOTION), 'r': recorte()}; bufs = {q: [] for q in gens}
+    gens = {'p': quadros(PESSOA), 'm': quadros(MOTION), 'h': quadros(METADE or PESSOA)}; bufs = {q: [] for q in gens}
     def get(q, i):
         lst = bufs[q]
         while len(lst) <= i:
@@ -140,7 +135,7 @@ def video(saida, so=None):
         if mo.shape[:2] != (H, W): mo = cv2.resize(mo, (W, H), interpolation=cv2.INTER_LANCZOS4)
         if m == 'M': return acabamento(mo)
         cima = acabamento(np.ascontiguousarray(mo[:960]))
-        return np.vstack([cima[:RC_Y], emenda(cima, get('r', i), escala[i])])
+        return np.vstack([cima, metade(get('h', i), escala[i])])
     cache = {}
     def B(i):
         i = min(max(i, 0), N - 1)
@@ -183,15 +178,24 @@ def audio(saida):
         tr *= rv * CFG.get('nivel_trilha', .16) / rt
         f = np.ones(len(tr)); n = int(1.5 * SR); f[-n:] = np.linspace(1, 0, n); f[:int(.3 * SR)] = np.linspace(0, 1, int(.3 * SR))
         mix = mix + tr * f[:, None]
-    ED = Path(CFG.get('efeitos_dir', 'trilhas/efeitos'))
-    def poe(t, nome, g):
+    ED = Path(CFG.get('efeitos_dir', 'trilhas/efeitos')); G = CFG.get('sfx_ganho', .5)
+    ORG = [0.0, 1.4, 2.65, 4.25, 5.7]   # as 5 variações dentro do click-organico.wav
+    n_org = [0]
+    def som(nome):
+        if nome == 'organico':
+            k = n_org[0] % 5; n_org[0] += 1; p = ED / 'click-organico.wav'
+            return le(p, ORG[k], 1.15) if p.exists() else None
+        if nome == 'magico': nome = 'click-magico'
         p = ED / f'{nome}.wav'
-        if not p.exists(): return
-        s = le(p); a = max(0, int(t * SR)); s = s[:max(0, len(mix) - a)]; mix[a:a + len(s)] += s * g
+        return le(p) if p.exists() else None
+    def poe(t, nome, g):
+        s = som(nome)
+        if s is None: print('  sem o efeito', nome, 'em', ED); return
+        a = max(0, int(t * SR)); s = s[:max(0, len(mix) - a)]; mix[a:a + len(s)] += s * g * G
     for t, nome, g in CFG.get('efeitos', []): poe(t, nome, g)
-    for t, tipo in TR.items():
-        nome, g = {'clarao': ('whoosh_in', .3), 'whip': ('whoosh2', .28), 'blur': ('whoosh_out', .18)}[tipo]
-        poe(t / FPS - .12, nome, g)
+    for t, tipo in sorted(TR.items()):
+        nome, g = {'clarao': ('magico', .38), 'whip': ('organico', 1.5), 'blur': ('organico', 1.1)}[tipo]
+        poe(t / FPS - .02, nome, g)
     pico = np.abs(mix).max()
     if pico > .98: mix *= .98 / pico
     w = wave.open(saida, 'wb'); w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)

@@ -14,8 +14,11 @@ labs.json:
   "cenas": [[0, 2.5, 0], [4.6, 9.2, 0], [26.9, 29.5, 1]],   [início, fim, capítulo? 1/0] dos trechos de motion
   "cortes": [12.3, 40.1],                   (opcional) cortes do vídeo da pessoa, pra trocar o punch-in
   "centro": [950, 400],                     (opcional) ponto do zoom (rosto), em px de 1080p
-  "trilha": "trilhas/<musica>.mp3",         (opcional) trilha contínua, ~16 dB abaixo da voz
-  "nivel_trilha": 0.16,
+  "trilha": "trilhas/<musica>.mp3",         (opcional) trilha — PADRÃO TESSMANN: épica/suspense SÓ NA ABERTURA (~1min30 e sai)
+  "trilha_ate": 100,                        (opcional) segundos em que a trilha termina de sumir (desce nos últimos 22 s);
+                                            sem isto a trilha fica contínua e baixa o vídeo inteiro (não é o padrão Tessmann)
+  "trilha_ini": 0,                          (opcional) pular a introdução lenta da música (segundos)
+  "nivel_trilha": 0.16,                     contínua ~0.16; abertura ~0.3 (abaixa sozinha quando a pessoa fala)
   "efeitos_dir": "trilhas/efeitos",         (opcional) pasta dos .wav: pop, click, tick, ding, whoosh_in, whoosh2, whoosh_out…
   "efeitos": [[0.9, "pop", 0.3]],           [tempo, nome do .wav sem extensão, ganho]
   "k4": false                               true = saída 3840x2160 (motion renderizado em 4K)
@@ -137,7 +140,18 @@ def le(path, ini=0, dur=None):
 
 def audio(saida):
     mix = le(PESSOA, 0, DUR)
-    if CFG.get('trilha'):
+    if CFG.get('trilha') and CFG.get('trilha_ate'):
+        # trilha só na abertura (padrão Tessmann): entra forte, abaixa quando a pessoa fala e some suave até "trilha_ate"
+        ate = min(float(CFG['trilha_ate']), DUR); n = int(ate * SR)
+        tr = le(CFG['trilha'], CFG.get('trilha_ini', 0), ate)[:n]; n = len(tr)
+        rv = np.sqrt((mix[:n] ** 2).mean()); rt = np.sqrt((tr ** 2).mean()) + 1e-9
+        tr *= rv * CFG.get('nivel_trilha', .3) / rt
+        env = np.sqrt(np.convolve((mix[:n] ** 2).mean(1), np.ones(int(.3 * SR)) / int(.3 * SR), 'same'))   # voz presente → trilha −6 dB
+        duck = 1 - .5 * np.clip(env / (rv + 1e-9), 0, 1)
+        duck = np.convolve(duck, np.ones(int(.25 * SR)) / int(.25 * SR), 'same')
+        f = np.ones(n); a0 = max(0, n - int(22 * SR)); f[a0:] = np.cos(np.linspace(0, np.pi / 2, n - a0)) ** 2; f[:int(.05 * SR)] = np.linspace(0, 1, int(.05 * SR))
+        mix[:n] += tr * (f * duck)[:, None]
+    elif CFG.get('trilha'):
         tr = le(CFG['trilha'])
         while len(tr) < len(mix): tr = np.concatenate([tr, tr])
         tr = tr[:len(mix)]

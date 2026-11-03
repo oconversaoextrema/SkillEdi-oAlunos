@@ -4,7 +4,7 @@ Padrão dos vídeos longos de YouTube do Tiago Tessmann a partir de novembro/202
 ("Como BOMBAR um canal com Claude em 7 dias", https://youtu.be/cCTRLHp5tJM): **a pessoa em tela cheia limpa, em
 blocos curtos, intercalada o tempo todo com motion de 1–4 s** em coral sobre fundos escuros e creme, com **serifa nos
 números e títulos**, **retícula de pontinhos por cima de todo o motion**, transições de clarão e chicote, **sem
-legenda**, trilha baixa contínua e muito efeito sonoro.
+legenda**, trilha épica só na abertura e muito efeito sonoro.
 
 Formato: **1920x1080, 30 fps** (4K só se o aluno pedir). Um formato só. Não tem tela dividida, não tem legenda,
 não tem texto em cima da pessoa. (O padrão anterior, com texto grande sobre o vídeo, está em
@@ -24,13 +24,31 @@ não tem texto em cima da pessoa. (O padrão anterior, com texto grande sobre o 
    (750 px, recorte centrado no rosto, corte seco). Tela cheia só às vezes: capítulos "Passo N", matéria real de impacto, gráfico-chave,
    frase de virada. Na dividida, o conteúdo da cena é ampliado até encher o painel (margem 70 px) — nada miúdo.
 
+3. **Pessoa no mínimo 3 s entre animações**: nunca animação → pessoa → animação em menos de 3 s (fica piscando). Ou a animação emenda direto na
+   próxima, ou a pessoa fica de verdade.
+4. **Efeitos sonoros baixinhos**: transição com um clique suave de interface (nada de whoosh alto), no ponto exato da troca; pops e cliques bem
+   por baixo da voz. Trilha diferente em cada vídeo.
+
+## 0b. Atualização (03/11/2026) — vale por cima das seções abaixo
+5. **Trilha épica / suspense / drama SÓ NA ABERTURA, uns 1min30 e sai** (a trilha lo-fi contínua foi reprovada). No `labs.json`:
+   `"trilha_ate": 100, "nivel_trilha": 0.3` (e `"trilha_ini"` para pular a introdução lenta da música). Ela abaixa quando a pessoa fala e
+   some suave nos últimos 22 s. Depois disso, só voz e efeitos.
+6. **Botão de inscrição clássico por cima da pessoa em tela cheia** (like + inscrever + sino animados, com som) — não uma barra
+   "Like / Inscreva-se" desenhada no motion. O trecho fica com a pessoa durante o botão (~5–6 s).
+7. **QR code / CTA do produto em cartão fixo no canto inferior direito** (~350 px de largura, 60 px das bordas), entrando com pop enquanto a
+   pessoa fala do produto — não dentro da animação.
+8. **Nada encavalado**: chips em fileira são uma linha flex centrada com espaço entre eles (nunca posição fixa a cada X px — textos de
+   tamanhos diferentes se sobrepõem). Antes do render, abrir cada cena no fim e conferir que nenhum elemento encosta (< 20 px) em outro.
+9. **Export em 4K com o motion renderizado em 4K** quando pedirem "qualidade top": render do HyperFrames com `--resolution landscape-4k`
+   e `"k4": true` no `labs.json`.
+
 ## 1. Ritmo e estrutura
 - **Corte a cada ~1,7 s em média.** A pessoa fica ~1/3 do tempo, em blocos de ~5 s; o resto é motion e telas,
   cada cena de 1–4 s, encadeadas.
 - Entre trechos da pessoa: **jump cut com punch-in/out de 10–15 %** (alternar 1,0 ↔ 1,1 a cada corte).
 - **Gancho de ~10 s** com números contando e peças entrando em sequência.
 - **Capítulos "Passo N"** (cartão "Passo **N**" + o nome do passo embaixo) em cada parte ou ação do roteiro.
-- Final: cena de "Inscreva-se · like · sino · link" em motion, depois volta pra pessoa até o fim.
+- Final: botão de inscrição clássico por cima da pessoa (item 6 da seção 0b), e a pessoa até o fim.
 - **Sem legenda.** Todo texto da tela é rótulo curto do motion (1–3 palavras, no máximo uma frase curta).
   A pessoa aparece sempre em tela cheia **limpa** — sem recorte, sem janelinha, sem texto por cima.
 
@@ -87,7 +105,7 @@ zoom lento de câmera (1 → 1,045) em cada cena.
 
 ## 7. Áudio
 - Voz tratada e limpa (ver `pipeline-tecnico.md`), cortes de respiro como sempre.
-- **Trilha baixa contínua o vídeo inteiro** (~−16 dB abaixo da voz; o vídeo nunca fica em silêncio), com fade no começo e no fim.
+- **Trilha só na abertura** (épica/suspense, ~1min30 e sai — item 5 da seção 0b). A contínua baixa o vídeo inteiro não é mais o padrão.
   O aluno escolhe a trilha (precisa ter licença); se não tiver, perguntar.
 - **Muitos efeitos curtos**: pop (ícone/card), clique (cursor), tique (contador), ding (check), whoosh (transição),
   da pasta `trilhas/efeitos/` do projeto. Volume baixo, por baixo da voz.
