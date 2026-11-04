@@ -25,10 +25,10 @@ labs-reels.json:
   "centro": [540, 600],                       (opcional) ponto do zoom na tela cheia (rosto)
   "trilha": "trilhas/<musica>.mp3",           (opcional) trilha contínua, ~16 dB abaixo da voz
   "nivel_trilha": 0.16,
-  "efeitos_dir": "trilhas/efeitos",           (opcional) pasta dos .wav. Precisa de click-organico.wav (clique com
-                                              reverb, 5 variações em 0 / 1,4 / 2,65 / 4,25 / 5,7 s) e click-magico.wav
-                                              (clique de menu) pras transições; os outros (pop, tick, click, sucesso…)
-                                              são opcionais
+  "efeitos_dir": "trilhas/efeitos",           (opcional) pasta dos .wav. click-organico.wav (clique com reverb, 5 variações
+                                              em 0 / 1,4 / 2,65 / 4,25 / 5,7 s) e click-magico.wav (clique de menu), das
+                                              transições, já vêm na skill em assets/efeitos; o aluno pode trocar pondo um
+                                              de mesmo nome nessa pasta. Os outros (pop, tick, click, sucesso…) são opcionais
   "efeitos": [[0.9, "pop", 0.3], [3.8, "magico", 0.3], [5.3, "organico", 1.3]],
                                               [tempo, nome do .wav sem extensão (ou "organico"/"magico"), ganho]
   "sfx_ganho": 0.5                            (opcional) multiplica TODOS os efeitos e transições (0,5 = −6 dB)
@@ -179,14 +179,16 @@ def audio(saida):
         f = np.ones(len(tr)); n = int(1.5 * SR); f[-n:] = np.linspace(1, 0, n); f[:int(.3 * SR)] = np.linspace(0, 1, int(.3 * SR))
         mix = mix + tr * f[:, None]
     ED = Path(CFG.get('efeitos_dir', 'trilhas/efeitos')); G = CFG.get('sfx_ganho', .5)
+    ED2 = Path(__file__).resolve().parent.parent / 'assets' / 'efeitos'   # os 2 cliques vêm com a skill
+    def acha(arq): return ED / arq if (ED / arq).exists() else ED2 / arq
     ORG = [0.0, 1.4, 2.65, 4.25, 5.7]   # as 5 variações dentro do click-organico.wav
     n_org = [0]
     def som(nome):
         if nome == 'organico':
-            k = n_org[0] % 5; n_org[0] += 1; p = ED / 'click-organico.wav'
+            k = n_org[0] % 5; n_org[0] += 1; p = acha('click-organico.wav')
             return le(p, ORG[k], 1.15) if p.exists() else None
         if nome == 'magico': nome = 'click-magico'
-        p = ED / f'{nome}.wav'
+        p = acha(f'{nome}.wav')
         return le(p) if p.exists() else None
     def poe(t, nome, g):
         s = som(nome)

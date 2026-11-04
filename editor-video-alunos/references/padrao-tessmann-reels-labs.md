@@ -98,8 +98,9 @@ No estúdio do Tiago (luz âmbar, parede escura):
   cursor, check ou contador ganha um som. Onde antes ia um whoosh ou brilho, use o clique orgânico (`"organico"`,
   ganho ~1,3) ou o mágico (`"magico"`, ganho ~0,3).
 - **Todos os efeitos baixos**: `sfx_ganho` 0,5 (−6 dB em tudo). Efeito não pode competir com a voz.
-- Os sons ficam em `trilhas/efeitos/` (`efeitos_dir`). `click-organico.wav` e `click-magico.wav` precisam existir
-  com esses nomes; sem eles a montagem avisa e segue sem o som da transição. Use cliques seus com os mesmos nomes.
+- `click-organico.wav` e `click-magico.wav` já vêm com a skill, em `assets/efeitos/`, e a montagem os usa sozinha.
+  Para trocar, ponha um arquivo com o mesmo nome em `trilhas/efeitos/` (`efeitos_dir`), que tem prioridade. Os demais
+  efeitos (pop, tick, click, sucesso…) ficam nessa pasta; sem eles a montagem avisa e segue sem aquele som.
 - **Monte a lista `efeitos` a partir das animações DESTE vídeo.** Copiar a lista de outro vídeo deixa os sons fora
   do lugar.
 
